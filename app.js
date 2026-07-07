@@ -126,7 +126,17 @@ const appState = {
   selectedColorFamily: "all"
 };
 
+const SUPABASE_URL = "https://qpjjocvkctfaydaxxzck.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwampvY3ZrY3RmYXlkYXh4emNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NTEzNDgsImV4cCI6MjA5OTAyNzM0OH0.GhcAHAiPNJX9PwCy8JUGirSNcjtcMcdK2mt8zXob9_s";
+
 let supabaseClient = null;
+if (typeof window !== "undefined" && window.supabase) {
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.error("Top-level Supabase initialization failed in app.js:", e);
+  }
+}
 
 /* ==========================================================================
    3. DOM ELEMENT SELECTORS (Pre-Cached for performance)
@@ -166,26 +176,14 @@ const DOM = {
    ========================================================================== */
 
 function loadSavedSupabaseCredentials() {
-  let url = localStorage.getItem("sb_url") || "";
-  let key = localStorage.getItem("sb_key") || "";
-  try {
-    if (!url && typeof import.meta !== "undefined" && import.meta.env) {
-      url = import.meta.env.VITE_SUPABASE_URL || "";
-    }
-    if (!key && typeof import.meta !== "undefined" && import.meta.env) {
-      key = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-    }
-  } catch (e) {
-    // Fail silently in development
-  }
-  return { url, key };
+  return { url: SUPABASE_URL, key: SUPABASE_ANON_KEY };
 }
 
 function initSupabase() {
-  const { url, key } = loadSavedSupabaseCredentials();
-  if (url && key && window.supabase) {
+  if (supabaseClient) return true;
+  if (window.supabase) {
     try {
-      supabaseClient = window.supabase.createClient(url, key);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       return true;
     } catch (e) {
       console.error("Supabase Client Initialization Error:", e);
