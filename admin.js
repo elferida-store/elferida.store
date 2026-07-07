@@ -9,7 +9,17 @@ const PERMITTED_EMAILS = [
   "elferida.store@gmail.com"
 ];
 
+const SUPABASE_URL = "https://qpjjocvkctfaydaxxzck.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwampvY3ZrY3RmYXlkYXh4emNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NTEzNDgsImV4cCI6MjA5OTAyNzM0OH0.GhcAHAiPNJX9PwCy8JUGirSNcjtcMcdK2mt8zXob9_s";
+
 let supabaseClient = null;
+if (typeof window !== "undefined" && window.supabase) {
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.error("Top-level Supabase initialization failed in admin.js:", e);
+  }
+}
 let currentProducts = [];
 
 // DOM Elements
@@ -48,18 +58,8 @@ const DOM = {
    ========================================================================== */
 
 function loadSavedSupabaseCredentials() {
-  let url = localStorage.getItem("sb_url") || "";
-  let key = localStorage.getItem("sb_key") || "";
-  try {
-    if (!url && typeof import.meta !== "undefined" && import.meta.env) {
-      url = import.meta.env.VITE_SUPABASE_URL || "";
-    }
-    if (!key && typeof import.meta !== "undefined" && import.meta.env) {
-      key = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-    }
-  } catch (e) {
-    // Fail silently in development
-  }
+  let url = localStorage.getItem("sb_url") || SUPABASE_URL;
+  let key = localStorage.getItem("sb_key") || SUPABASE_ANON_KEY;
   return { url, key };
 }
 
@@ -69,8 +69,10 @@ function initSupabase() {
   if (url && key && window.supabase) {
     try {
       supabaseClient = window.supabase.createClient(url, key);
-      DOM.configStatusLbl.textContent = "متصل بنجاح";
-      DOM.configStatusLbl.className = "config-status active";
+      if (DOM.configStatusLbl) {
+        DOM.configStatusLbl.textContent = "متصل بنجاح";
+        DOM.configStatusLbl.className = "config-status active";
+      }
       if (DOM.inputUrl) DOM.inputUrl.value = url;
       if (DOM.inputKey) DOM.inputKey.value = key;
       return true;
@@ -79,8 +81,10 @@ function initSupabase() {
     }
   }
   
-  DOM.configStatusLbl.textContent = "غير متصل";
-  DOM.configStatusLbl.className = "config-status inactive";
+  if (DOM.configStatusLbl) {
+    DOM.configStatusLbl.textContent = "غير متصل";
+    DOM.configStatusLbl.className = "config-status inactive";
+  }
   return false;
 }
 
