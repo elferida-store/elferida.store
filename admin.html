@@ -13,24 +13,27 @@
   <!-- Supabase JS Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
+  <!-- Lucide Icons JS Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <style>
     :root {
-      --bg-outer: #FAF6F0;       /* Warm beige canvas background */
-      --bg-app: #FFFDFB;         /* Creamy white card/app background */
-      --bg-card: #FDFBF8;        /* Soft vanilla-cream card */
-      --bg-pill: #F6F1EA;        /* Gentle sand beige */
-      --border-light: #EFE9DE;   /* Delicate oatmeal border */
+      --bg-outer: #F4F6FA;       /* Ultra-light, soft grayish-blue body background */
+      --bg-app: #FFFFFF;         /* Pure solid white app background */
+      --bg-card: #FFFFFF;        /* Pure solid white card background */
+      --bg-pill: #EEF2FF;        /* Soft pastel lavender/blue background for unselected states */
+      --border-light: #E5E7EB;   /* Delicate very light gray border */
       
-      --color-text-main: #3E3A35;  /* Rich warm cocoa/charcoal */
-      --color-text-muted: #7E7870; /* Muted warm grey */
-      --color-text-light: #A59F96; /* Very soft gray */
+      --color-text-main: #1F2937;  /* Deep navy/charcoal for crisp readability */
+      --color-text-muted: #6B7280; /* Soft slate gray */
+      --color-text-light: #9CA3AF; /* Muted gray */
       
-      --color-primary: #C97A7A;     /* Soft kashmire/rose accent */
-      --color-primary-hover: #B86767;
-      --color-primary-light: #FBF6F6;
+      --color-primary: #4F46E5;     /* Deep indigo/blue text */
+      --color-primary-hover: #4338CA;
+      --color-primary-light: #EEF2FF; /* Soft pastel lavender/blue */
       
-      --color-terracotta: #D06A4C;  /* Secondary earthy terracotta */
-      --color-whatsapp: #5F8575;     /* Sage green */
+      --color-terracotta: #E74C3C;  /* Secondary warm/muted red */
+      --color-whatsapp: #00A389;     /* Custom professional green */
       
       --font-sans: 'Cairo', system-ui, -apple-system, sans-serif;
       --font-serif: 'Playfair Display', 'Cairo', serif;
@@ -38,9 +41,9 @@
       --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       
-      --shadow-sm: 0 2px 8px rgba(62, 58, 53, 0.03);
-      --shadow-md: 0 10px 30px rgba(62, 58, 53, 0.05);
-      --shadow-lg: 0 15px 45px rgba(62, 58, 53, 0.08);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.01);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.008), 0 1px 2px rgba(0, 0, 0, 0.01);
+      --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.012), 0 1px 4px rgba(0, 0, 0, 0.01);
     }
 
     * {
@@ -227,30 +230,31 @@
     }
 
     .admin-input-text {
-      padding: 8px 12px;
+      padding: 10px 12px;
       border: 1px solid var(--border-light);
-      border-radius: 8px;
+      border-radius: 12px; /* Consistent inner button and input rounded corner profile */
       font-family: var(--font-sans);
-      font-size: 12px;
+      font-size: 13px;
       background-color: #FFFFFF;
       color: var(--color-text-main);
       outline: none;
-      transition: border-color var(--transition-fast);
+      transition: all var(--transition-fast);
       width: 100%;
     }
 
     .admin-input-text:focus {
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08); /* Accent colored focus boundary */
     }
 
     .btn-save-credentials {
       background-color: var(--color-primary);
       color: #FFFFFF;
       border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 10px 16px;
+      border-radius: 10px; /* Inner button 10px border radius */
       font-family: var(--font-sans);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       width: 100%;
@@ -274,7 +278,7 @@
     /* 2.1 Sidebar (Fixed Right-side) */
     .dashboard-sidebar {
       width: 280px;
-      background-color: #FAF6F0; /* Soft beige/ivory */
+      background-color: #FFFFFF; /* Clean, pure white sidebar */
       border-left: 1px solid var(--border-light);
       padding: 32px 24px;
       display: flex;
@@ -331,8 +335,8 @@
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      border-radius: 12px;
-      color: var(--color-text-main);
+      border-radius: 12px; /* Consistent generous rounded corner profile */
+      color: var(--color-text-muted); /* Soft slate gray */
       text-decoration: none;
       font-size: 14px;
       font-weight: 600;
@@ -345,15 +349,15 @@
     }
 
     .nav-item:hover {
-      background-color: #F3EAE0;
+      background-color: #F4F6FA; /* Light gray-blue tint */
       color: var(--color-primary);
     }
 
     .nav-item.active {
-      background-color: #FFFDFB;
+      background-color: #EEF2FF; /* Soft pastel lavender/blue */
       color: var(--color-primary);
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border-light);
+      box-shadow: none;
+      border: none;
     }
 
     .nav-icon {
@@ -366,9 +370,9 @@
       gap: 12px;
       padding: 12px 16px;
       border-radius: 12px;
-      color: #C14B4B;
-      background: transparent;
-      border: 1px solid transparent;
+      color: #E74C3C; /* Muted red text */
+      background-color: #FEECEF; /* Soft pastel pink container background */
+      border: none;
       font-family: var(--font-sans);
       font-size: 14px;
       font-weight: 700;
@@ -380,8 +384,7 @@
     }
 
     .sidebar-logout-btn:hover {
-      background-color: #FDF3F3;
-      border-color: #F3D2D2;
+      background-color: #FCD8DC; /* slightly deeper pink */
     }
 
     /* 2.2 Main Panel Area (Scrollable Left-side) */
@@ -389,7 +392,7 @@
       margin-right: 280px; /* Leave space for the right sidebar */
       flex-grow: 1;
       padding: 40px;
-      background-color: #FFFDFB;
+      background-color: var(--bg-outer); /* Ultra-light soft grayish-blue tint */
       min-height: 100vh;
       overflow-y: auto;
       display: flex;
@@ -457,7 +460,7 @@
     /* 2.3 Statistics Grid */
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr); /* Responsive 4-card row layout */
       gap: 20px;
       margin-bottom: 36px;
     }
@@ -465,50 +468,69 @@
     .stat-bento-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-light);
-      border-radius: 16px;
+      border-radius: 20px; /* Generous rounded corners across components */
       padding: 24px;
       display: flex;
+      flex-direction: row-reverse; /* Metric info on left, badge on right */
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md); /* Ultra-faint, wide-spreading blur */
       transition: transform var(--transition-fast);
     }
 
     .stat-bento-card:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-lg);
     }
 
     .stat-bento-info {
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
     }
 
     .stat-bento-label {
       font-size: 12px;
       font-weight: 700;
-      color: var(--color-text-muted);
+      color: var(--color-text-muted); /* Soft slate gray */
       margin-bottom: 4px;
     }
 
     .stat-bento-value {
       font-size: 32px;
       font-weight: 800;
-      color: var(--color-text-main);
+      color: var(--color-text-main); /* Deep navy/charcoal */
       line-height: 1.2;
     }
 
     .stat-bento-icon {
-      font-size: 28px;
-      background-color: #FFFDFB;
+      font-size: 24px;
       width: 54px;
       height: 54px;
-      border-radius: 12px;
+      border-radius: 12px; /* Dedicated rounded square badge */
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--border-light);
-      box-shadow: inset 0 2px 4px rgba(62, 58, 53, 0.02);
+      border: none;
+    }
+
+    /* Soft Pastel Accents for Badges */
+    .stat-neutral {
+      background-color: #EEF2FF !important;
+      color: #4F46E5 !important;
+    }
+    .stat-success {
+      background-color: #E6F7F0 !important;
+      color: #00A389 !important;
+    }
+    .stat-danger {
+      background-color: #FEECEF !important;
+      color: #E74C3C !important;
+    }
+    .stat-warning {
+      background-color: #FEF5E7 !important;
+      color: #D35400 !important;
     }
 
     /* Layout Columns */
@@ -560,24 +582,25 @@
     .admin-select {
       padding: 10px 12px;
       border: 1px solid var(--border-light);
-      border-radius: 10px;
+      border-radius: 12px; /* Consistent inner button and input rounded corner profile */
       font-family: var(--font-sans);
       font-size: 13px;
       background-color: #FFFFFF;
       color: var(--color-text-main);
       outline: none;
       width: 100%;
-      transition: border-color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
 
     .admin-select:focus {
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08); /* Accent colored focus boundary */
     }
 
     .admin-textarea {
       padding: 10px 12px;
       border: 1px solid var(--border-light);
-      border-radius: 10px;
+      border-radius: 12px; /* Consistent inner button and input rounded corner profile */
       font-family: var(--font-sans);
       font-size: 13px;
       background-color: #FFFFFF;
@@ -586,11 +609,12 @@
       width: 100%;
       min-height: 80px;
       resize: vertical;
-      transition: border-color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
 
     .admin-textarea:focus {
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08); /* Accent colored focus boundary */
     }
 
     /* Upload Zone & Previews */
@@ -1206,8 +1230,8 @@
 
   <!-- VIEW 2: Google Authentication Card (State 1) -->
   <div id="admin-auth" class="auth-page-wrapper hidden">
-    <div class="auth-brand-logo">
-      <span class="logo-emoji">🧶</span>
+    <div class="auth-brand-logo" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <span class="logo-emoji" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="flower" style="width: 36px; height: 36px; color: var(--color-primary);"></i></span>
       <h1>خيوط الفريدة</h1>
       <p>بوابة الإدارة وبناء الإبداع</p>
     </div>
@@ -1217,8 +1241,8 @@
       <p class="auth-desc-text">يرجى تسجيل الدخول باستخدام حساب جوجل المصرح له بإدارة المخزن والمنتجات.</p>
 
       <!-- STRICT Authorization Error Banner -->
-      <div id="auth-error-banner" class="auth-error-banner hidden">
-        <span class="err-icon">⚠️</span>
+      <div id="auth-error-banner" class="auth-error-banner hidden" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+        <span class="err-icon" style="display: inline-flex;"><i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: var(--color-terracotta);"></i></span>
         <div id="auth-error-text">عذراً، هذا الحساب لا يملك صلاحية دخول للوحة التحكم.</div>
       </div>
 
@@ -1231,8 +1255,8 @@
 
       <!-- Database Config System -->
       <div>
-        <button id="btn-toggle-config-panel" class="supa-config-trigger">
-          ⚙️ إدارة اتصالات قاعدة بيانات Supabase
+        <button id="btn-toggle-config-panel" class="supa-config-trigger" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <i data-lucide="settings" style="width: 14px; height: 14px;"></i> إدارة اتصالات قاعدة بيانات Supabase
         </button>
         <div id="supabase-config-panel" class="supa-config-panel hidden">
           <h4>إعدادات ربط Supabase (محلية)</h4>
@@ -1259,7 +1283,7 @@
     <!-- 2.1 Sidebar (Fixed Right-side) -->
     <aside class="dashboard-sidebar">
       <div class="sidebar-logo">
-        <span class="logo-emoji">🧶</span>
+        <span class="logo-emoji" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="scissors" style="width: 24px; height: 24px; color: var(--color-primary);"></i></span>
         <div>
           <span class="sidebar-logo-text">خيوط الفريدة</span>
           <span class="sidebar-logo-sub">لوحة الإدارة والمخزن</span>
@@ -1270,17 +1294,17 @@
 
       <nav class="sidebar-nav">
         <button id="nav-btn-form" class="nav-item active">
-          <span class="nav-icon">🧶</span>
+          <span class="nav-icon" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="plus" style="width: 18px; height: 18px;"></i></span>
           <span>إضافة منتج</span>
         </button>
         <button id="nav-btn-inventory" class="nav-item">
-          <span class="nav-icon">📦</span>
+          <span class="nav-icon" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="database" style="width: 18px; height: 18px;"></i></span>
           <span>إدارة المخزن</span>
         </button>
       </nav>
 
-      <button id="btn-admin-logout" class="sidebar-logout-btn">
-        <span class="nav-icon">🚪</span>
+      <button id="btn-admin-logout" class="sidebar-logout-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+        <span class="nav-icon" style="display: inline-flex;"><i data-lucide="log-out" style="width: 18px; height: 18px;"></i></span>
         <span>تسجيل الخروج</span>
       </button>
     </aside>
@@ -1311,23 +1335,39 @@
             <span class="stat-bento-label">إجمالي المنتجات</span>
             <span id="stat-total-items" class="stat-bento-value">0</span>
           </div>
-          <div class="stat-bento-icon" style="color: var(--color-primary)">🧶</div>
+          <div class="stat-bento-icon stat-neutral" style="display: inline-flex; align-items: center; justify-content: center;">
+            <i data-lucide="package" style="width: 24px; height: 24px;"></i>
+          </div>
         </div>
 
         <div class="stat-bento-card">
           <div class="stat-bento-info">
             <span class="stat-bento-label">القطع المتاحة فوري</span>
-            <span id="stat-instock-items" class="stat-bento-value" style="color: var(--color-whatsapp)">0</span>
+            <span id="stat-instock-items" class="stat-bento-value">0</span>
           </div>
-          <div class="stat-bento-icon" style="color: var(--color-whatsapp)">✅</div>
+          <div class="stat-bento-icon stat-success" style="display: inline-flex; align-items: center; justify-content: center;">
+            <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+          </div>
         </div>
 
         <div class="stat-bento-card">
           <div class="stat-bento-info">
             <span class="stat-bento-label">القطع غير المتوفرة</span>
-            <span id="stat-outofstock-items" class="stat-bento-value" style="color: var(--color-terracotta)">0</span>
+            <span id="stat-outofstock-items" class="stat-bento-value">0</span>
           </div>
-          <div class="stat-bento-icon" style="color: var(--color-terracotta)">❌</div>
+          <div class="stat-bento-icon stat-danger" style="display: inline-flex; align-items: center; justify-content: center;">
+            <i data-lucide="slash" style="width: 24px; height: 24px;"></i>
+          </div>
+        </div>
+
+        <div class="stat-bento-card">
+          <div class="stat-bento-info">
+            <span class="stat-bento-label">الأكثر مبيعاً</span>
+            <span id="stat-bestseller-items" class="stat-bento-value">0</span>
+          </div>
+          <div class="stat-bento-icon stat-warning" style="display: inline-flex; align-items: center; justify-content: center;">
+            <i data-lucide="star" style="width: 24px; height: 24px;"></i>
+          </div>
         </div>
       </section>
 
@@ -1349,10 +1389,10 @@
             <div class="supa-form-group" style="margin-bottom: 16px;">
               <label class="admin-label" for="new-category">فئة المنتج <span class="req">*</span></label>
               <select id="new-category" class="admin-select" required>
-                <option value="خيوط">🧶 شلات خيوط الكروشيه</option>
-                <option value="سنارات">🪡 سنارات احترافية</option>
-                <option value="شبك">🕸️ شبك حقائب وعلب</option>
-                <option value="إكسسوارات">🌸 إكسسوارات وماركر غرز</option>
+                <option value="خيوط">شلات خيوط الكروشيه</option>
+                <option value="سنارات">سنارات احترافية</option>
+                <option value="شبك">شبك حقائب وعلب</option>
+                <option value="إكسسوارات">إكسسوارات وماركر غرز</option>
               </select>
             </div>
 
@@ -1435,7 +1475,7 @@
               
               <!-- File Drag and Drop zone -->
               <div class="image-upload-wrapper" id="image-dropzone">
-                <span class="upload-prompt-icon">📸</span>
+                <span class="upload-prompt-icon" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="image" style="width: 36px; height: 36px; color: var(--color-primary); margin-bottom: 8px;"></i></span>
                 <span class="upload-prompt-text">اسحبي وأفلتي الصورة هنا</span>
                 <span class="upload-prompt-sub">أو انقري لاختيار ملف من جهازكِ</span>
                 <input type="file" id="image-file-input" accept="image/*" class="hidden">
@@ -1447,7 +1487,10 @@
                 <div class="preview-meta">
                   <h5 id="preview-filename">اسم_الملف.jpg</h5>
                   <p id="preview-filesize">0 KB</p>
-                  <button type="button" id="btn-remove-preview" class="btn-remove-preview">إزالة الصورة ❌</button>
+                  <button type="button" id="btn-remove-preview" class="btn-remove-preview" style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span>إزالة الصورة</span>
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                  </button>
                 </div>
               </div>
 
@@ -1494,7 +1537,10 @@
 
             <!-- Action submit stack -->
             <div class="form-actions-stack">
-              <button type="submit" id="btn-submit-form" class="btn-publish">نشر المنتج في المتجر 🧶</button>
+              <button type="submit" id="btn-submit-form" class="btn-publish" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>نشر المنتج في المتجر</span>
+                <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+              </button>
               <button type="button" id="btn-cancel-edit" class="btn-cancel-edit hidden">إلغاء التعديل</button>
             </div>
 
@@ -1505,7 +1551,10 @@
         <section id="table-card-container" class="inventory-section-card">
           <div class="inventory-header-row">
             <div class="inventory-title-grp">
-              <h3>📦 إدارة المخزن والكتالوج</h3>
+              <h3 style="display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="database" style="width: 20px; height: 20px; color: var(--color-primary);"></i>
+                <span>إدارة المخزن والكتالوج</span>
+              </h3>
               <p id="dashboard-count-lbl">جاري تحميل المنتجات...</p>
             </div>
           </div>
@@ -1513,16 +1562,16 @@
           <!-- Toolbar Search / Filter -->
           <div class="inventory-toolbar">
             <div class="search-input-wrapper">
-              <span class="search-icon-inside">🔍</span>
+              <span class="search-icon-inside" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="search" style="width: 16px; height: 16px; color: var(--color-text-muted);"></i></span>
               <input type="text" id="inventory-search" class="search-input-field" placeholder="ابحثي باسم المنتج أو كود التخزين...">
             </div>
             <div>
               <select id="inventory-category-filter" class="admin-select">
                 <option value="all">كل الفئات</option>
-                <option value="خيوط">🧶 شلات الخيوط</option>
-                <option value="سنارات">🪡 سنارات</option>
-                <option value="شبك">🕸️ شبك حقائب</option>
-                <option value="إكسسوارات">🌸 إكسسوارات</option>
+                <option value="خيوط">شلات الخيوط</option>
+                <option value="سنارات">سنارات</option>
+                <option value="شبك">شبك حقائب</option>
+                <option value="إكسسوارات">إكسسوارات</option>
               </select>
             </div>
           </div>
@@ -1549,8 +1598,14 @@
           <div class="pagination-bar">
             <span id="pagination-info" class="pagination-lbl">عرض 1 - 10 من أصل 10 منتج</span>
             <div class="pagination-buttons">
-              <button id="btn-prev-page" class="btn-page-nav" disabled>السابق</button>
-              <button id="btn-next-page" class="btn-page-nav" disabled>التالي</button>
+              <button id="btn-prev-page" class="btn-page-nav" disabled style="display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                <span>السابق</span>
+              </button>
+              <button id="btn-next-page" class="btn-page-nav" disabled style="display: inline-flex; align-items: center; gap: 4px;">
+                <span>التالي</span>
+                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+              </button>
             </div>
           </div>
 
@@ -1565,7 +1620,9 @@
   <div id="confirm-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-content">
-        <span id="confirm-modal-icon" class="modal-icon-header">💡</span>
+        <div id="confirm-modal-icon" class="modal-icon-header" style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--color-primary);">
+          <i data-lucide="help-circle" style="width: 48px; height: 48px;"></i>
+        </div>
         <h3 id="confirm-modal-title" class="modal-title">تأكيد الإجراء</h3>
         <p id="confirm-modal-message" class="modal-body-text">هل أنتِ متأكدة من رغبتكِ في تنفيذ هذا التعديل؟</p>
         <div class="modal-actions-row">
