@@ -11,24 +11,24 @@
    ========================================== */
 :root {
   /* Color Palette */
-  --bg-outer: #FAF6F0;       /* Luxurious, warm ivory body background for desktop */
-  --bg-app: #FFFDFB;         /* Pristine creamy white app background */
-  --bg-card: #FDFBF8;        /* Soft vanilla-cream card background */
-  --bg-pill: #F6F1EA;        /* Gentle sand beige for unselected states */
-  --border-light: #EFE9DE;   /* Delicate oatmeal border */
+  --bg-outer: #F4F6FA;       /* Ultra-light, soft grayish-blue body background */
+  --bg-app: #FFFFFF;         /* Pure solid white app background */
+  --bg-card: #FFFFFF;        /* Pure solid white card background */
+  --bg-pill: #EEF2FF;        /* Soft pastel lavender/blue background for unselected states */
+  --border-light: #E5E7EB;   /* Delicate very light gray border */
   
-  --color-text-main: #3E3A35;  /* Rich warm-charcoal/brown for organic reading comfort */
-  --color-text-muted: #7E7870; /* Warm-tinted medium gray for subheadings */
-  --color-text-light: #A59F96; /* Soft warm gray for descriptors */
+  --color-text-main: #1F2937;  /* Deep navy/charcoal for crisp readability */
+  --color-text-muted: #6B7280; /* Soft slate gray */
+  --color-text-light: #9CA3AF; /* Muted gray */
   
-  --color-primary: #C97A7A;     /* Delicate muted rose accent */
-  --color-primary-hover: #B86767;
-  --color-terracotta: #D06A4C;  /* Secondary warm earthy terracotta */
-  --color-accent-cream: #F9F3EA;
+  --color-primary: #4F46E5;     /* Deep indigo/blue text */
+  --color-primary-hover: #4338CA;
+  --color-terracotta: #E74C3C;  /* Secondary warm/muted red */
+  --color-accent-cream: #F9F5F0;
   
-  --color-whatsapp: #5F8575;     /* Custom sage green to match boutique styling */
-  --color-whatsapp-hover: #4E6F61;
-  --color-whatsapp-light: #EBF2EE;
+  --color-whatsapp: #00A389;     /* Custom sage green to match boutique styling */
+  --color-whatsapp-hover: #008771;
+  --color-whatsapp-light: #E6F7F0;
   
   /* Typography */
   --font-sans: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -405,13 +405,11 @@ body {
 /* Premium Category Tabs (UX Upgraded) */
 .category-tabs-wrapper {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
+  flex-wrap: wrap; /* Allow wrapping on mobile so all tabs are fully visible */
+  justify-content: center; /* Center tabs for pristine boutique layout */
+  gap: 8px; /* Balanced gap for mobile */
   padding: 8px 4px 16px 4px;
   margin-bottom: 16px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  justify-content: flex-start;
 }
 
 .category-tabs-wrapper::-webkit-scrollbar {
@@ -439,7 +437,7 @@ body {
 .category-tab:hover {
   background-color: var(--color-accent-cream);
   color: var(--color-primary);
-  border-color: rgba(201, 122, 122, 0.3);
+  border-color: rgba(79, 70, 229, 0.3);
   transform: translateY(-1px);
 }
 
@@ -447,7 +445,7 @@ body {
   background-color: var(--color-primary);
   color: #FFFFFF;
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(201, 122, 122, 0.25);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   animation: confirmSelection 0.3s ease-out;
 }
 
@@ -673,24 +671,28 @@ body {
 /* ==========================================
    8. DUAL-COLUMN PRODUCTS GRID (UX Requirements 4)
    ========================================== */
-.products-grid {
+#products-grid, .products-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px; /* Tight gap for modern look */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem; /* Boutique spacing for mobile */
   justify-content: center;
   opacity: 1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 16px; /* Inner padding to frame cards nicely within the shadowed container */
 }
 
 /* Beautiful Product Cards */
 .product-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: 12px;
+  border-radius: 20px; /* Updated for soft boutique feel */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
   opacity: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Unified boutique depth box shadow */
   transition: all 0.3s ease;
   animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   max-width: 280px; /* Cap card size strictly */
@@ -698,10 +700,10 @@ body {
   margin: 0 auto; /* Keep cards centered inside cell boundaries */
 }
 
-.product-card:hover, .product-card:active {
+.product-card:hover, .product-card:active, #products-grid .product-card:hover {
   transform: scale(1.02);
   border-color: var(--color-primary);
-  box-shadow: 0 8px 24px rgba(62, 58, 53, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); /* Refined hover shadow with increased boutique depth */
 }
 
 /* Image container */
@@ -911,6 +913,44 @@ body {
   max-width: 80%;
 }
 
+/* Premium Call to Action Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px) scale(1.025);
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.18);
+}
+
+@media (min-width: 768px) {
+  .btn-primary {
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+}
+
 .btn-secondary {
   background-color: var(--bg-pill);
   color: var(--color-text-main);
@@ -1045,43 +1085,67 @@ body {
 }
 
 .modal-content {
-  padding: 20px;
+  padding: 28px 24px;
+  background-color: var(--bg-app);
 }
 
 .modal-tag {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--color-primary);
-  margin-bottom: 4px;
-  display: block;
+  background-color: var(--bg-pill);
+  padding: 6px 14px;
+  border-radius: 30px;
+  display: inline-block;
+  margin-bottom: 14px;
+  font-family: var(--font-sans);
 }
 
 .modal-title {
   font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
   color: var(--color-text-main);
-  margin-bottom: 12px;
-  line-height: 1.3;
+  margin-bottom: 16px;
+  line-height: 1.45;
 }
 
 .modal-body-text {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--color-text-muted);
-  line-height: 1.6;
+  line-height: 1.75;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-  max-height: 200px;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-height: 220px;
   overflow-y: auto;
+  padding-left: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-light) transparent;
+}
+
+.modal-body-text::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal-body-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body-text::-webkit-scrollbar-thumb {
+  background-color: var(--border-light);
+  border-radius: 10px;
+}
+
+.modal-body-text::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-light);
 }
 
 .modal-cta-btn {
   width: 100%;
-  justify-content: center;
 }
 
 /* ==========================================
@@ -1173,10 +1237,10 @@ body {
 
 @media (min-width: 768px) {
   /* Expand products grid with controlled, capped card widths on tablets */
-  .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  #products-grid, .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     justify-content: center;
-    gap: 20px;
+    gap: 1.5rem; /* Balanced tablet transition gap */
   }
 
   /* Expand social hub stories into a beautiful centered horizontal row */
@@ -1238,11 +1302,11 @@ body {
 
 @media (min-width: 1024px) {
   /* Max 4 columns on wide screens, keeping cards perfectly aligned and capped */
-  .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  #products-grid, .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     max-width: 1200px;
     margin: 0 auto;
-    gap: 24px;
+    gap: 2rem; /* Boutique spacing for desktop resolutions */
     justify-content: center;
   }
 
