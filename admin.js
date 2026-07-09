@@ -1,4 +1,3 @@
-
 /**
  * بوابة الإدارة ومخزن خيوط الفريدة للكروشيه
  * Refactored secure administration dashboard with strict email checks, paginated catalog searching,
@@ -39,6 +38,7 @@ const DOM = {
   statTotal: document.getElementById("stat-total-items"),
   statInStock: document.getElementById("stat-instock-items"),
   statOutOfStock: document.getElementById("stat-outofstock-items"),
+  statBestSeller: document.getElementById("stat-bestseller-items"),
   dashboardCount: document.getElementById("dashboard-count-lbl"),
 
   // Form Controls
@@ -277,7 +277,13 @@ async function loadCatalogFromSupabase() {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    currentProducts = data || [];
+    currentProducts = (data || []).map(p => {
+      // Ensure compatibility: map is_in_stock column value to is_available and vice-versa
+      const inStock = p.is_in_stock !== undefined ? p.is_in_stock : (p.is_available !== undefined ? p.is_available : true);
+      p.is_in_stock = inStock;
+      p.is_available = inStock;
+      return p;
+    });
   } catch (err) {
     console.error("Failed to query catalog:", err);
     showToast("خطأ في قراءة بيانات المتجر: " + err.message);
@@ -301,10 +307,12 @@ function updateStats() {
   const total = currentProducts.length;
   const inStock = currentProducts.filter(p => p.is_available).length;
   const outOfStock = total - inStock;
+  const bestSellers = currentProducts.filter(p => p.is_best_seller).length;
 
   if (DOM.statTotal) DOM.statTotal.textContent = total;
   if (DOM.statInStock) DOM.statInStock.textContent = inStock;
   if (DOM.statOutOfStock) DOM.statOutOfStock.textContent = outOfStock;
+  if (DOM.statBestSeller) DOM.statBestSeller.textContent = bestSellers;
   
   if (DOM.dashboardCount) {
     DOM.dashboardCount.textContent = `يتوفر لديكِ ${total} منتجاً مسجلاً في الكتالوج حالياً.`;
@@ -499,6 +507,8 @@ function renderProductsTable() {
     const safePrice = isNaN(rawPrice) ? 0 : rawPrice;
     const sku = product.storage_code || "غير محدد";
 
+    const isProductInStock = product.is_in_stock !== undefined ? product.is_in_stock : (product.is_available !== undefined ? product.is_available : true);
+
     tr.innerHTML = `
       <td>
         <div class="table-product-cell">
@@ -517,15 +527,15 @@ function renderProductsTable() {
       </td>
       <td>
         <label class="switch">
-          <input type="checkbox" class="toggle-stock" data-id="${product.id}" ${product.is_available ? "checked" : ""}>
+          <input type="checkbox" class="toggle-stock" data-id="${product.id}" ${isProductInStock ? "checked" : ""}>
           <span class="slider"></span>
         </label>
       </td>
       <td>
         <div class="row-actions-grp">
-          <button class="action-row-btn edit" data-id="${product.id}" title="تعديل بيانات المنتج">✏️</button>
-          <button class="action-row-btn copy" data-id="${product.id}" title="نسخ رابط المنتج المباشر">🔗</button>
-          <button class="action-row-btn delete" data-id="${product.id}" title="حذف المنتج نهائياً">❌</button>
+          <button class="action-row-btn edit" data-id="${product.id}" title="تعديل بيانات المنتج" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="pencil" style="width: 14px; height: 14px;"></i></button>
+          <button class="action-row-btn copy" data-id="${product.id}" title="نسخ رابط المنتج المباشر" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="link" style="width: 14px; height: 14px;"></i></button>
+          <button class="action-row-btn delete" data-id="${product.id}" title="حذف المنتج نهائياً" style="display: inline-flex; align-items: center; justify-content: center;"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
         </div>
       </td>
     `;
@@ -568,7 +578,7 @@ function renderProductsTable() {
     tr.querySelector(".action-row-btn.copy").addEventListener("click", () => {
       const productUrl = `${window.location.origin}/index.html?product=${product.id}`;
       navigator.clipboard.writeText(productUrl).then(() => {
-        showToast("تم نسخ رابط المنتج المباشر بنجاح! 🔗");
+        showToast("تم نسخ رابط المنتج المباشر بنجاح!");
       }).catch(err => {
         showToast("عذراً، فشل نسخ الرابط.");
       });
@@ -578,6 +588,11 @@ function renderProductsTable() {
   });
 
   DOM.tableBody.appendChild(fragment);
+
+  // Re-initialize Lucide Icons for dynamic table rows
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
 /* ==========================================================================
@@ -587,9 +602,11 @@ function renderProductsTable() {
 async function updateProductField(id, field, value) {
   if (!supabaseClient) return;
   try {
+    const dbField = field === "is_available" ? "is_in_stock" : field;
+
     const { error } = await supabaseClient
       .from("products")
-      .update({ [field]: value })
+      .update({ [dbField]: value })
       .eq("id", id);
 
     if (error) throw error;
@@ -597,7 +614,7 @@ async function updateProductField(id, field, value) {
     // Update locally
     currentProducts = currentProducts.map(p => {
       if (p.id === id) {
-        return { ...p, [field]: value };
+        return { ...p, is_available: value, is_in_stock: value };
       }
       return p;
     });
@@ -676,7 +693,7 @@ function fillFormForEditing(product) {
   }
 
   // Switches
-  if (DOM.newInStock) DOM.newInStock.checked = !!product.is_available;
+  if (DOM.newInStock) DOM.newInStock.checked = !!(product.is_in_stock !== undefined ? product.is_in_stock : product.is_available);
   if (DOM.newBestSeller) DOM.newBestSeller.checked = !!product.is_best_seller;
   if (DOM.newArrival) DOM.newArrival.checked = !!product.is_new_arrival;
 
@@ -711,8 +728,11 @@ async function handleFormSubmit(e) {
   const title = DOM.newTitle.value.trim();
   const price = parseFloat(DOM.newPrice.value);
   const category = DOM.newCategory.value;
-  const storageCode = DOM.newStorageCode.value.trim();
+  const rawStorageCode = DOM.newStorageCode.value.trim();
   const editId = DOM.editProductId.value;
+
+  // Sanitize storage_code to strip common injection characters, leaving uppercase clean string
+  const storageCode = rawStorageCode.toUpperCase().replace(/[<>'"%;()]/g, "");
 
   if (!title || isNaN(price) || !storageCode) {
     showToast("يرجى ملء جميع الحقول الإلزامية بنجاح.");
@@ -744,8 +764,10 @@ async function handleFormSubmit(e) {
       category,
       storage_code: storageCode,
       image_url: finalImageUrl,
+      image: finalImageUrl, // Ensure full database schema column compliance
       description: DOM.newDescription.value.trim() || "خامة وجودة عالية كروشيه صناعة يدوية فاخرة.",
-      is_available: DOM.newInStock.checked,
+      is_in_stock: DOM.newInStock.checked,
+      is_available: DOM.newInStock.checked, // Backward compatibility with frontend logic
       is_best_seller: DOM.newBestSeller.checked,
       is_new_arrival: DOM.newArrival.checked,
     };
