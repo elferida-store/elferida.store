@@ -210,6 +210,10 @@ async function getActiveProducts() {
       if (data && data.length > 0) {
         return data.map(p => {
           if (!p.category) p.category = "خيوط";
+          // Ensure is_available aligns with is_in_stock column value
+          const inStock = p.is_in_stock !== undefined ? p.is_in_stock : (p.is_available !== undefined ? p.is_available : true);
+          p.is_in_stock = inStock;
+          p.is_available = inStock;
           return p;
         });
       }
@@ -718,8 +722,19 @@ function initializeModal() {
 /* ==========================================================================
    9. APPLICATION INGRESS
    ========================================================================== */
-document.addEventListener("DOMContentLoaded", () => {
+function init() {
   initializeFilters();
   initializeModal();
   buildFullCatalogDOM(); // Single initial pull and layout render on startup
-});
+
+  // Initialize Lucide Icons for static page elements
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
