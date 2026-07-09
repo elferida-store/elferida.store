@@ -806,18 +806,19 @@ async function handleFormSubmit(e) {
 
       showToast(`تم تحديث بيانات المنتج [${title}] بنجاح!`);
     } else {
-      // Create Mode Insert
-      const newId = `${category === "خيوط" ? "yarn" : "item"}-${Date.now()}`;
-      const finalPayload = { id: newId, created_at: new Date().toISOString(), ...payload };
+      // Create Mode Insert (id is omitted to let database generate it)
+      const finalPayload = { created_at: new Date().toISOString(), ...payload };
 
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from("products")
-        .insert([finalPayload]);
+        .insert([finalPayload])
+        .select();
 
       if (error) throw error;
 
-      // Add to local cache
-      currentProducts.unshift(finalPayload);
+      // Add to local cache (retrieve auto-generated id)
+      const insertedProduct = (data && data[0]) ? data[0] : { id: Date.now(), ...finalPayload };
+      currentProducts.unshift(insertedProduct);
       showToast(`تم نشر منتجكِ الجديد [${title}] بنجاح بالمتجر!`);
     }
 
