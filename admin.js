@@ -1,130 +1,13 @@
 /**
- * خيوط الفريدة للكروشيه - محرك عرض وتصفية المنتجات باللغة العربية
- * Refactored solution using secure live Supabase integration and blistering fast non-destructive class toggling.
+ * لوحة تحكم الإدارة - خيوط الفريدة للكروشيه
+ * Senior-Architect optimized secure CRUD managers, instant route guards, and live Supabase querying.
  */
 
-/* ==========================================================================
-   1. DEFAULT MOCK DATA COLLECTION (Fallback for High-Availability if Supabase is unconfigured)
-   ========================================================================== */
-const DEFAULT_STORE_PRODUCTS = [
-  {
-    id: "yarn-001",
-    category: "خيوط",
-    title: "قطن كومفورت الفاخر",
-    brand: "Alize",
-    material: "Cotton",
-    color_name: "كشمير وردي هادئ",
-    color_family: "red-pink",
-    price: 85.00,
-    image_url: "/images/terracotta_rose.jpg",
-    is_available: true,
-    is_best_seller: true,
-    is_new_arrival: false
-  },
-  {
-    id: "yarn-002",
-    category: "خيوط",
-    title: "ميرينو دريم الفاخر",
-    brand: "Nako",
-    material: "Wool",
-    color_name: "أخضر ميرمية ساحر",
-    color_family: "green-sage",
-    price: 142.00,
-    image_url: "/images/sage_green.jpg",
-    is_available: true,
-    is_best_seller: true,
-    is_new_arrival: true
-  },
-  {
-    id: "needle-001",
-    category: "سنارات",
-    title: "طقم سنارات تيوبروز الذهبية",
-    price: 245.00,
-    size: "8 مقاسات (2.5 - 6.0 ملم)",
-    description: "سنارات مريحة بمقبض سليكون ناعم لتقليل تعب اليدين أثناء الحياكة الطويلة.",
-    image_url: "/images/warm_mustard.jpg",
-    is_available: true,
-    is_best_seller: true,
-    is_new_arrival: true
-  },
-  {
-    id: "yarn-003",
-    category: "خيوط",
-    title: "شلة الكلاسيك اليومية",
-    brand: "Alize",
-    material: "Acrylic",
-    color_name: "أزرق باستيل ناعم",
-    color_family: "blue-denim",
-    price: 69.00,
-    image_url: "/images/denim_blue.jpg",
-    is_available: true,
-    is_best_seller: false,
-    is_new_arrival: false
-  },
-  {
-    id: "mesh-001",
-    category: "شبك",
-    title: "شبك حقائب بلاستيكي مرن",
-    price: 32.00,
-    size: "30x50 سم - فتحات 2 ملم",
-    description: "شبك كروشيه عالي الجودة لصناعة حقائب وعلب منسوجة متماسكة واحترافية.",
-    image_url: "/images/earthy_beige.jpg",
-    is_available: true,
-    is_best_seller: false,
-    is_new_arrival: false
-  },
-  {
-    id: "yarn-004",
-    category: "خيوط",
-    title: "إيكو سوفت قطن عضوي",
-    brand: "Himalaya",
-    material: "Cotton",
-    color_name: "وردي بلوسوم دافئ",
-    color_family: "red-pink",
-    price: 98.00,
-    image_url: "/images/terracotta_rose.jpg",
-    is_available: true,
-    is_best_seller: false,
-    is_new_arrival: true
-  },
-  {
-    id: "needle-002",
-    category: "سنارات",
-    title: "سنارة بامبو طبيعي فردية",
-    price: 55.00,
-    size: "مقاس 4.0 ملم",
-    description: "سنارة بامبو خفيفة الوزن ومصقولة بعناية فائقة لانزلاق مثالي وسلس للخيوط.",
-    image_url: "/images/sage_green.jpg",
-    is_available: true,
-    is_best_seller: false,
-    is_new_arrival: false
-  },
-  {
-    id: "acc-001",
-    category: "إكسسوارات",
-    title: "مجموعة علامات الغرز الفاخرة",
-    price: 48.00,
-    size: "علبة بها 50 قطعة ملونة",
-    description: "دبابيس لتحديد الغرز البلاستيكية الآمنة مريحة للاستخدام وسهلة الغلق.",
-    image_url: "/images/denim_blue.jpg",
-    is_available: true,
-    is_best_seller: false,
-    is_new_arrival: false
-  }
+// Permitted Admin Emails
+const PERMITTED_EMAILS = [
+  "noviumnodes@gmail.com",
+  "elferida.store@gmail.com"
 ];
-
-/* WhatsApp Store Contact Number */
-const WHATSAPP_PHONE_NUMBER = "20123456789"; 
-
-/* ==========================================================================
-   2. APPLICATION STATE
-   ========================================================================== */
-const appState = {
-  selectedCategory: "all",
-  selectedBrand: "all",
-  selectedMaterial: "all",
-  selectedColorFamily: "all"
-};
 
 const SUPABASE_URL = "https://qpjjocvkctfaydaxxzck.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwampvY3ZrY3RmYXlkYXh4emNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NTEzNDgsImV4cCI6MjA5OTAyNzM0OH0.GhcAHAiPNJX9PwCy8JUGirSNcjtcMcdK2mt8zXob9_s";
@@ -134,71 +17,215 @@ if (typeof window !== "undefined" && window.supabase) {
   try {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
-    console.error("Top-level Supabase initialization failed in app.js:", e);
+    console.error("Top-level Supabase initialization failed in admin.js:", e);
   }
 }
+let currentProducts = [];
 
-/* ==========================================================================
-   3. DOM ELEMENT SELECTORS (Pre-Cached for performance)
-   ========================================================================== */
+// DOM Elements
 const DOM = {
-  productsGrid: document.getElementById("products-grid"),
-  emptyState: document.getElementById("empty-state"),
-  activeFiltersMeta: document.getElementById("active-filters-meta"),
-  txtResultsCount: document.getElementById("txt-results-count"),
-  btnClearFilters: document.getElementById("btn-clear-filters"),
-  btnResetEmpty: document.getElementById("btn-reset-empty"),
-  brandFilters: document.querySelectorAll('[data-filter-type="brand"]'),
-  materialFilters: document.querySelectorAll('[data-filter-type="material"]'),
-  colorFilters: document.querySelectorAll('[data-filter-type="color_family"]'),
-  storyTriggerAbout: document.getElementById("story-trigger-about"),
-  storyModal: document.getElementById("story-modal"),
-  modalCloseBtn: document.getElementById("modal-close-btn"),
-  modalExploreBtn: document.getElementById("modal-explore-btn"),
-  catalogSection: document.getElementById("catalog-section"),
-  categoryTabs: document.querySelectorAll(".category-tab"),
-  filterBar: document.getElementById("filter-bar"),
+  loadingView: document.getElementById("admin-loading"),
+  authView: document.getElementById("admin-auth"),
+  dashboardView: document.getElementById("admin-dashboard"),
+  userNav: document.getElementById("admin-user-nav"),
+  emailDisplay: document.getElementById("admin-email-display"),
+  btnGoogleAuth: document.getElementById("btn-google-auth"),
+  btnLogOut: document.getElementById("btn-admin-logout"),
   
-  // Dropdown System Elements
-  triggerBrand: document.getElementById("trigger-brand"),
-  triggerColor: document.getElementById("trigger-color"),
-  triggerMaterial: document.getElementById("trigger-material"),
-  menuBrand: document.getElementById("menu-brand"),
-  menuColor: document.getElementById("menu-color"),
-  menuMaterial: document.getElementById("menu-material"),
-  badgeBrand: document.getElementById("badge-brand"),
-  badgeColor: document.getElementById("badge-color"),
-  badgeMaterial: document.getElementById("badge-material")
+  // Stats Elements
+  statTotal: document.getElementById("stat-total-items"),
+  statInStock: document.getElementById("stat-instock-items"),
+  statOutOfStock: document.getElementById("stat-outofstock-items"),
+  statBestSeller: document.getElementById("stat-bestseller-items"),
+  dashboardCount: document.getElementById("dashboard-count-lbl"),
+
+  // Table & Form
+  tableBody: document.getElementById("admin-tbody-products"),
+  formAdd: document.getElementById("form-add-product"),
+  toast: document.getElementById("admin-toast"),
+
+  // Supabase Configuration Panel
+  btnToggleConfig: document.getElementById("btn-toggle-config-panel"),
+  configPanel: document.getElementById("supabase-config-panel"),
+  inputUrl: document.getElementById("input-sb-url"),
+  inputKey: document.getElementById("input-sb-key"),
+  btnSaveConfig: document.getElementById("btn-save-sb-config"),
+  configStatusLbl: document.getElementById("config-status-lbl")
 };
 
 /* ==========================================================================
-   4. SUPABASE CREDENTIALS & DB ENGINE
+   1. SUPABASE CLIENT HANDLER
    ========================================================================== */
 
 function loadSavedSupabaseCredentials() {
-  return { url: SUPABASE_URL, key: SUPABASE_ANON_KEY };
+  let url = localStorage.getItem("sb_url") || SUPABASE_URL;
+  let key = localStorage.getItem("sb_key") || SUPABASE_ANON_KEY;
+  return { url, key };
 }
 
 function initSupabase() {
-  if (supabaseClient) return true;
-  if (window.supabase) {
+  const { url, key } = loadSavedSupabaseCredentials();
+  
+  if (url && key && window.supabase) {
     try {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      supabaseClient = window.supabase.createClient(url, key);
+      if (DOM.configStatusLbl) {
+        DOM.configStatusLbl.textContent = "متصل بنجاح";
+        DOM.configStatusLbl.className = "config-status active";
+      }
+      if (DOM.inputUrl) DOM.inputUrl.value = url;
+      if (DOM.inputKey) DOM.inputKey.value = key;
       return true;
     } catch (e) {
-      console.error("Supabase Client Initialization Error:", e);
+      console.error("Supabase Initialization Failed", e);
     }
+  }
+  
+  if (DOM.configStatusLbl) {
+    DOM.configStatusLbl.textContent = "غير متصل";
+    DOM.configStatusLbl.className = "config-status inactive";
   }
   return false;
 }
 
-/**
- * Fetch products directly from the Supabase table (products).
- * LocalStorage reading has been completely eliminated for products data.
- */
-async function getActiveProducts() {
-  const isConnected = initSupabase();
-  if (isConnected && supabaseClient) {
+/* ==========================================================================
+   2. AUTHENTICATION & SECURITY CONTROLLER (Strict Guarding)
+   ========================================================================== */
+
+async function checkAuthSession() {
+  // Show loading initially to prevent any flash of layout/products
+  showView("loading");
+
+  // Completely wipe any sandbox quick-access variables from local storage to prevent bypass
+  localStorage.removeItem("admin_sandbox_active");
+
+  const connected = initSupabase();
+  if (!connected || !supabaseClient) {
+    showView("auth");
+    return;
+  }
+
+  // Subscribe to auth state changes to dynamically catch OAuth redirect tokens
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    console.log("Auth event triggered:", event, session ? "Session active" : "No session");
+    
+    // Auto-strip URL token hash to keep the browser address bar clean and prevent routing issues
+    if (window.location.hash && (window.location.hash.includes("access_token=") || window.location.hash.includes("id_token=") || window.location.hash.includes("error="))) {
+      try {
+        const cleanUrl = window.location.pathname + window.location.search;
+        window.history.replaceState(null, document.title, cleanUrl);
+      } catch (e) {
+        console.error("Failed to cleanly strip URL token hash:", e);
+      }
+    }
+
+    if (session && session.user) {
+      const userEmail = (session.user.email || "").toLowerCase().trim();
+      const isPermitted = PERMITTED_EMAILS.some(email => email.toLowerCase().trim() === userEmail);
+      if (isPermitted) {
+        await loadCatalogFromSupabase();
+        setupAdminDashboard(session.user.email);
+      } else {
+        // Unpermitted user: secure wipe and relative redirect to avoid 404s on GitHub Pages
+        document.body.innerHTML = "";
+        window.location.replace("index.html");
+      }
+    } else {
+      // Not logged in or logged out
+      showView("auth");
+    }
+  });
+
+  // Query session immediately for fast initial check
+  try {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+
+    if (session && session.user) {
+      const userEmail = (session.user.email || "").toLowerCase().trim();
+      const isPermitted = PERMITTED_EMAILS.some(email => email.toLowerCase().trim() === userEmail);
+      if (isPermitted) {
+        await loadCatalogFromSupabase();
+        setupAdminDashboard(session.user.email);
+
+        // Strip the hash from the browser address bar if present
+        if (window.location.hash && (window.location.hash.includes("access_token=") || window.location.hash.includes("id_token="))) {
+          const cleanUrl = window.location.pathname + window.location.search;
+          window.history.replaceState(null, document.title, cleanUrl);
+        }
+      } else {
+        document.body.innerHTML = "";
+        window.location.replace("index.html");
+      }
+    } else {
+      // If there's no active session yet but the URL hash contains OAuth tokens, we let the onAuthStateChange handle it.
+      // Otherwise, immediately show the auth login view.
+      if (!window.location.hash || (!window.location.hash.includes("access_token=") && !window.location.hash.includes("id_token="))) {
+        showView("auth");
+      }
+    }
+  } catch (err) {
+    console.error("Auth session validation error on startup:", err);
+    showView("auth");
+  }
+}
+
+function handleGoogleLogin() {
+  if (!supabaseClient) {
+    showToast("يرجى إدخال وحفظ بيانات اتصال Supabase أولاً!");
+    DOM.configPanel.classList.remove("hidden");
+    return;
+  }
+
+  try {
+    // Generate the exact redirect URI based on current URL path (compatible with GitHub Pages repository subdirectories)
+    const redirectUrl = window.location.href.split('#')[0].split('?')[0];
+    supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl
+      }
+    });
+  } catch (err) {
+    showToast("فشل توجيه المصادقة: " + err.message);
+  }
+}
+
+function handleLogOut() {
+  if (supabaseClient) {
+    supabaseClient.auth.signOut().then(() => {
+      showToast("تم تسجيل الخروج بنجاح");
+      setTimeout(() => {
+        window.location.replace("index.html");
+      }, 1000);
+    });
+  } else {
+    window.location.replace("index.html");
+  }
+}
+
+function showView(viewName) {
+  DOM.loadingView.classList.add("hidden");
+  DOM.authView.classList.add("hidden");
+  DOM.dashboardView.classList.add("hidden");
+  DOM.userNav.classList.add("hidden");
+
+  if (viewName === "loading") {
+    DOM.loadingView.classList.remove("hidden");
+  } else if (viewName === "auth") {
+    DOM.authView.classList.remove("hidden");
+  } else if (viewName === "dashboard") {
+    DOM.dashboardView.classList.remove("hidden");
+    DOM.userNav.classList.remove("hidden");
+  }
+}
+
+/* ==========================================================================
+   3. CATALOG STATE MANAGEMENT (CRUD Engine)
+   ========================================================================== */
+
+async function loadCatalogFromSupabase() {
+  if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient
         .from("products")
@@ -207,159 +234,53 @@ async function getActiveProducts() {
       
       if (error) throw error;
       
-      if (data && data.length > 0) {
-        return data.map(p => {
-          if (!p.category) p.category = "خيوط";
-          return p;
-        });
-      }
+      currentProducts = data || [];
     } catch (err) {
-      console.error("Failed to fetch products from Supabase. Falling back to offline fallback data.", err);
+      console.error("Failed to load products from database:", err);
+      showToast("خطأ في جلب بيانات الكتالوج: " + err.message);
+      currentProducts = [];
     }
-  }
-  return DEFAULT_STORE_PRODUCTS;
-}
-
-/* ==========================================================================
-   5. CATALOG RENDER ENGINE (Pristine non-destructive class toggle system)
-   ========================================================================== */
-
-/**
- * Renders all store items into the DOM exactly ONCE during application ingress.
- */
-async function buildFullCatalogDOM() {
-  DOM.productsGrid.innerHTML = "";
-  
-  const products = await getActiveProducts();
-  
-  if (products.length === 0) {
-    DOM.productsGrid.classList.add("hidden");
-    DOM.emptyState.classList.remove("hidden");
-    updateFilterMetaUI(0);
-    return;
-  }
-  
-  DOM.emptyState.add = "hidden"; // Safe reset
-  DOM.emptyState.classList.add("hidden");
-  DOM.productsGrid.classList.remove("hidden");
-  
-  const fragment = document.createDocumentFragment();
-  products.forEach((product, index) => {
-    const card = createProductCard(product);
-    // Capped animation delay for smooth entry
-    card.style.animationDelay = `${Math.min(index, 8) * 50}ms`;
-    fragment.appendChild(card);
-  });
-  
-  DOM.productsGrid.appendChild(fragment);
-  
-  // Apply filtering system state over existing DOM elements initially
-  applyFilters();
-}
-
-/**
- * Blistering-fast non-destructive filter toggling system.
- * Avoids .innerHTML re-renders and eliminates heavy browser repaints.
- */
-function applyFilters() {
-  const cards = DOM.productsGrid.querySelectorAll(".product-card");
-  let visibleCount = 0;
-  
-  cards.forEach(card => {
-    const category = card.getAttribute("data-category") || "خيوط";
-    const brand = card.getAttribute("data-brand") || "all";
-    const material = card.getAttribute("data-material") || "all";
-    const colorFamily = card.getAttribute("data-color-family") || "all";
-    
-    const categoryMatch = appState.selectedCategory === "all" || category === appState.selectedCategory;
-    const brandMatch = appState.selectedBrand === "all" || brand === appState.selectedBrand;
-    const materialMatch = appState.selectedMaterial === "all" || material === appState.selectedMaterial;
-    const colorMatch = appState.selectedColorFamily === "all" || colorFamily === appState.selectedColorFamily;
-    
-    const isMatch = categoryMatch && brandMatch && materialMatch && colorMatch;
-    
-    if (isMatch) {
-      card.classList.remove("hidden");
-      visibleCount++;
-    } else {
-      card.classList.add("hidden");
-    }
-  });
-  
-  // Toggle layout structure based on dynamic visible counts
-  if (visibleCount === 0) {
-    DOM.productsGrid.classList.add("hidden");
-    DOM.emptyState.classList.remove("hidden");
   } else {
-    DOM.emptyState.classList.add("hidden");
-    DOM.productsGrid.classList.remove("hidden");
-  }
-  
-  // Sync the metadata text
-  updateFilterMetaUI(visibleCount);
-  
-  // Synchronize dropdown controls
-  syncDropdownTriggers();
-}
-
-/**
- * Synchronizes the visual active states and badges of the multi-dropdown system.
- */
-function syncDropdownTriggers() {
-  if (DOM.triggerBrand && DOM.badgeBrand) {
-    if (appState.selectedBrand === "all") {
-      DOM.triggerBrand.classList.remove("active-trigger");
-      DOM.badgeBrand.textContent = "الكل";
-    } else {
-      DOM.triggerBrand.classList.add("active-trigger");
-      DOM.badgeBrand.textContent = translateBrand(appState.selectedBrand);
-    }
-  }
-
-  if (DOM.triggerMaterial && DOM.badgeMaterial) {
-    if (appState.selectedMaterial === "all") {
-      DOM.triggerMaterial.classList.remove("active-trigger");
-      DOM.badgeMaterial.textContent = "الكل";
-    } else {
-      DOM.triggerMaterial.classList.add("active-trigger");
-      DOM.badgeMaterial.textContent = translateMaterial(appState.selectedMaterial);
-    }
-  }
-
-  if (DOM.triggerColor && DOM.badgeColor) {
-    if (appState.selectedColorFamily === "all") {
-      DOM.triggerColor.classList.remove("active-trigger");
-      DOM.badgeColor.textContent = "الكل";
-    } else {
-      DOM.triggerColor.classList.add("active-trigger");
-      let colorName = "الكل";
-      switch (appState.selectedColorFamily) {
-        case "red-pink": colorName = "وردي/أحمر"; break;
-        case "blue-denim": colorName = "أزرق"; break;
-        case "green-sage": colorName = "أخضر"; break;
-        case "earthy-beige": colorName = "بيج"; break;
-        case "yellow-mustard": colorName = "خردلي"; break;
-      }
-      DOM.badgeColor.textContent = colorName;
-    }
+    currentProducts = [];
   }
 }
 
+function setupAdminDashboard(email) {
+  DOM.emailDisplay.textContent = email;
+  renderProductsTable();
+  updateStats();
+  showView("dashboard");
+  showToast("تمت المصادقة وتسجيل الدخول بنجاح.");
+}
+
+function updateStats() {
+  DOM.statTotal.textContent = currentProducts.length;
+  
+  const inStock = currentProducts.filter(p => p.is_available).length;
+  DOM.statInStock.textContent = inStock;
+  DOM.statOutOfStock.textContent = currentProducts.length - inStock;
+  
+  const bestSellers = currentProducts.filter(p => p.is_best_seller).length;
+  DOM.statBestSeller.textContent = bestSellers;
+
+  DOM.dashboardCount.textContent = `${currentProducts.length} منتجاً مسجلاً في المتجر حالياً`;
+}
+
 /**
- * Translates material name to Arabic for client display
+ * Translates material name to Arabic for admin table display
  */
 function translateMaterial(mat) {
   switch(mat) {
-    case "Cotton": return "قطن طبيعي";
-    case "Wool": return "صوف ناعم";
-    case "Acrylic": return "أكريليك فاخر";
-    case "Silk": return "مزيج الحرير";
+    case "Cotton": return "قطن";
+    case "Wool": return "صوف";
+    case "Acrylic": return "أكريليك";
+    case "Silk": return "مزيج حرير";
     default: return mat || "";
   }
 }
 
 /**
- * Translates brand name to Arabic for client display
+ * Translates brand name to Arabic for admin table display
  */
 function translateBrand(br) {
   switch(br) {
@@ -371,355 +292,325 @@ function translateBrand(br) {
   }
 }
 
-/**
- * Creates product card DOM element with appropriate attributes and datasets
- * @param {Object} product Product model
- * @returns {HTMLElement} Custom formatted div element
- */
-function createProductCard(product) {
-  const cardDiv = document.createElement("div");
-  cardDiv.className = "product-card";
-  cardDiv.id = `card-${product.id}`;
-  
-  // Set filter dataset tags for non-destructive class filtering
-  cardDiv.setAttribute("data-category", product.category || "خيوط");
-  cardDiv.setAttribute("data-brand", product.brand || "all");
-  cardDiv.setAttribute("data-material", product.material || "all");
-  cardDiv.setAttribute("data-color-family", product.color_family || "all");
+function renderProductsTable() {
+  DOM.tableBody.innerHTML = "";
 
-  // Overlaid badges markup
-  let badgeHTML = "";
-  if (!product.is_available) {
-    badgeHTML += `<span class="badge badge-stock out-of-stock">غير متوفر</span>`;
-  } else {
-    badgeHTML += `<span class="badge badge-stock">متوفر في المخزن</span>`;
-    if (product.is_best_seller) {
-      badgeHTML += `<span class="badge badge-promo">الأكثر مبيعاً</span>`;
-    } else if (product.is_new_arrival) {
-      badgeHTML += `<span class="badge badge-new">وصل حديثاً</span>`;
+  const fragment = document.createDocumentFragment();
+
+  currentProducts.forEach(product => {
+    const tr = document.createElement("tr");
+    tr.id = `row-${product.id}`;
+
+    // Handle appropriate details markup based on product category
+    let detailsHTML = "";
+    if (product.category === "خيوط") {
+      detailsHTML = `${translateBrand(product.brand)} • ${translateMaterial(product.material)} • درجة اللون: ${product.color_name || "درجة مميزة"}`;
+    } else {
+      const sizeDesc = product.size ? `• ${product.size}` : "";
+      detailsHTML = `${product.category} ${sizeDesc} • ${product.description || "لا يوجد وصف"}`;
     }
-  }
 
-  const isAvailable = product.is_available;
-  const btnClass = isAvailable ? "btn-order-wa" : "btn-order-wa disabled";
-  const btnText = isAvailable ? "اطلبي الآن عبر الواتساب" : "منتهي من المخزن";
-  const btnDisabledAttr = isAvailable ? "" : "disabled aria-disabled='true'";
+    const rawPrice = product.price !== undefined && product.price !== null ? parseFloat(product.price) : 0;
+    const safePrice = isNaN(rawPrice) ? 0 : rawPrice;
 
-  // Handle dynamic metadata and descriptions based on category type
-  let metaHTML = "";
-  let descriptionHTML = "";
+    tr.innerHTML = `
+      <td>
+        <div class="td-product">
+          <img class="admin-thumb" src="${product.image_url}" alt="Thumbnail" referrerpolicy="no-referrer">
+          <div class="product-info-text">
+            <h4>${product.title}</h4>
+            <span>${detailsHTML}</span>
+          </div>
+        </div>
+      </td>
+      <td>
+        <input type="number" step="0.01" class="price-input" value="${safePrice.toFixed(2)}" data-id="${product.id}">
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" class="toggle-stock" data-id="${product.id}" ${product.is_available ? "checked" : ""}>
+          <span class="slider"></span>
+        </label>
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" class="toggle-bestseller" data-id="${product.id}" ${product.is_best_seller ? "checked" : ""}>
+          <span class="slider"></span>
+        </label>
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" class="toggle-new" data-id="${product.id}" ${product.is_new_arrival ? "checked" : ""}>
+          <span class="slider"></span>
+        </label>
+      </td>
+      <td>
+        <button class="btn-delete" data-id="${product.id}" title="حذف المنتج">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </button>
+      </td>
+    `;
 
-  if (product.category === "خيوط") {
-    metaHTML = `${translateBrand(product.brand)} • ${translateMaterial(product.material)}`;
-    descriptionHTML = `درجة اللون: ${product.color_name || "درجة مميزة"}`;
-  } else {
-    metaHTML = `${product.category} ${product.size ? `• ${product.size}` : ""}`;
-    descriptionHTML = product.description || "خامة وجودة عالية ومناسبة للأعمال الاحترافية";
-  }
-
-  cardDiv.innerHTML = `
-    <div class="product-image-container">
-      <div class="badge-container">
-        ${badgeHTML}
-      </div>
-      <img class="product-image" 
-           src="${product.image_url}" 
-           alt="${product.title}" 
-           loading="lazy" 
-           referrerpolicy="no-referrer">
-    </div>
-    <div class="product-details">
-      <span class="product-meta">${metaHTML}</span>
-      <h3 class="product-title" title="${product.title}">${product.title}</h3>
-      <span class="product-shade">${descriptionHTML}</span>
-      <div class="price-row">
-        <span class="price-tag">${product.price} ج.م</span>
-      </div>
-      <button class="${btnClass}" ${btnDisabledAttr} data-product-id="${product.id}">
-        <svg class="wa-icon wa-icon-inline" viewBox="0 0 64 64">
-          <path d="M30.19.031a31.753 31.753 0 0 0-26.735 46.12L.085 62.509A1.235 1.235 0 0 0 1.58 63.96l16.029-3.8A31.744 31.744 0 1 0 30.19.031zM49.316 49.31A24.871 24.871 0 0 1 20.68 54l-2.232-1.112-9.828 2.326 2.069-10.042-1.1-2.154a24.874 24.874 0 0 1 4.578-28.857A24.854 24.854 0 0 1 49.316 49.31zm0 0" fill="currentColor"></path>
-          <path d="M47.147 38.619L41 36.854a2.292 2.292 0 0 0-2.267.6l-1.5 1.531a2.239 2.239 0 0 1-2.435.514C31.883 38.32 25.765 32.88 24.2 30.16a2.239 2.239 0 0 1 .177-2.483l1.312-1.7a2.292 2.292 0 0 0 .283-2.328L23.388 17.8a2.293 2.293 0 0 0-3.58-.82c-1.716 1.451-3.752 3.657-4 6.1-.436 4.308 1.411 9.738 8.4 16.258 8.071 7.534 14.534 8.528 18.743 7.509 2.387-.578 4.294-2.9 5.5-4.793a2.293 2.293 0 0 0-1.3-3.436z" fill="currentColor"></path>
-        </svg>
-        <span>${btnText}</span>
-      </button>
-    </div>
-  `;
-
-  // Attach interactive click handler to order button if item is in stock
-  if (isAvailable) {
-    const orderBtn = cardDiv.querySelector(".btn-order-wa");
-    orderBtn.addEventListener("click", () => handleOrderClick(product));
-  }
-
-  return cardDiv;
-}
-
-/* ==========================================================================
-   6. DYNAMIC WHATSAPP LINK GENERATION (Bespoke custom encoded message)
-   ========================================================================== */
-
-/**
- * Constructs an aesthetic, custom-encoded pre-filled WhatsApp link and opens it
- * @param {Object} product Selected item details
- */
-function handleOrderClick(product) {
-  let message = `مرحباً خيوط الفريدة للكروشيه! 🌸\n\nأود طلب منتج مميز من كتالوج متجركم:\n\n`;
-  message += `• الفئة: ${product.category}\n`;
-  message += `• المنتج: ${product.title}\n`;
-  
-  if (product.category === "خيوط") {
-    message += `• البراند: ${translateBrand(product.brand)}\n`;
-    message += `• الخامة: ${translateMaterial(product.material)}\n`;
-    message += `• درجة اللون: ${product.color_name || "غير محدد"}\n`;
-  } else {
-    if (product.size) message += `• المقاس: ${product.size}\n`;
-    if (product.description) message += `• الوصف: ${product.description}\n`;
-  }
-  
-  message += `• السعر: ${product.price} ج.م\n\n`;
-  message += `يرجى إفادتي بتوفر هذا المنتج للتوصيل. شكراً جزيلاً لكم!`;
-
-  const encodedText = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodedText}`;
-
-  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-}
-
-/* ==========================================================================
-   7. FILTER HANDLING & SYSTEM RESET
-   ========================================================================== */
-
-/**
- * Toggle visibility of reset action bar based on whether filters are selected
- * @param {Number} count Result count matching filters
- */
-function updateFilterMetaUI(count) {
-  const isAnyFilterActive = appState.selectedBrand !== "all" || 
-                             appState.selectedMaterial !== "all" || 
-                             appState.selectedColorFamily !== "all";
-
-  if (isAnyFilterActive && (appState.selectedCategory === "all" || appState.selectedCategory === "خيوط")) {
-    DOM.activeFiltersMeta.classList.remove("hidden");
-    DOM.txtResultsCount.textContent = `عرض ${count} من منتجات الكروشيه الفاخرة`;
-  } else {
-    DOM.activeFiltersMeta.classList.add("hidden");
-  }
-}
-
-/**
- * Resets all parameters to show the complete catalog list
- */
-function resetAllFilters() {
-  appState.selectedBrand = "all";
-  appState.selectedMaterial = "all";
-  appState.selectedColorFamily = "all";
-
-  // Re-sync all buttons styling states in dropdown lists
-  DOM.brandFilters.forEach(btn => {
-    btn.classList.toggle("active", btn.getAttribute("data-filter-value") === "all");
-  });
-  
-  DOM.materialFilters.forEach(btn => {
-    btn.classList.toggle("active", btn.getAttribute("data-filter-value") === "all");
-  });
-
-  DOM.colorFilters.forEach(btn => {
-    btn.classList.toggle("active", btn.getAttribute("data-filter-value") === "all");
-  });
-
-  applyFilters();
-}
-
-/**
- * Coordinate and bind event handlers to category tabs and filter touch-pill rows
- */
-function initializeFilters() {
-  // Category tabs click handler
-  DOM.categoryTabs.forEach(tab => {
-    tab.addEventListener("click", (e) => {
-      const cat = e.currentTarget.getAttribute("data-category");
-      appState.selectedCategory = cat;
-
-      // Style management
-      DOM.categoryTabs.forEach(t => t.classList.remove("active"));
-      e.currentTarget.classList.add("active");
-
-      // Collapsing / Hiding subfilters for non-yarn categories
-      if (cat === "all" || cat === "خيوط") {
-        if (DOM.filterBar) DOM.filterBar.classList.remove("collapsed");
-      } else {
-        if (DOM.filterBar) DOM.filterBar.classList.add("collapsed");
-        // Reset subfilters so they don't block needles/mesh/accessories rendering
-        appState.selectedBrand = "all";
-        appState.selectedMaterial = "all";
-        appState.selectedColorFamily = "all";
+    // Bind item-level events
+    // Price change
+    const priceInput = tr.querySelector(".price-input");
+    priceInput.addEventListener("change", async (e) => {
+      const pid = e.target.getAttribute("data-id");
+      const val = parseFloat(e.target.value);
+      if (!isNaN(val) && val >= 0) {
+        await updateProductField(pid, "price", val);
       }
-
-      applyFilters();
     });
+
+    // In Stock Toggle
+    const stockToggle = tr.querySelector(".toggle-stock");
+    stockToggle.addEventListener("change", async (e) => {
+      const pid = e.target.getAttribute("data-id");
+      await updateProductField(pid, "is_available", e.target.checked);
+    });
+
+    // Best Seller Toggle
+    const bsToggle = tr.querySelector(".toggle-bestseller");
+    bsToggle.addEventListener("change", async (e) => {
+      const pid = e.target.getAttribute("data-id");
+      await updateProductField(pid, "is_best_seller", e.target.checked);
+    });
+
+    // New Arrival Toggle
+    const newToggle = tr.querySelector(".toggle-new");
+    newToggle.addEventListener("change", async (e) => {
+      const pid = e.target.getAttribute("data-id");
+      await updateProductField(pid, "is_new_arrival", e.target.checked);
+    });
+
+    // Delete Button
+    const deleteBtn = tr.querySelector(".btn-delete");
+    deleteBtn.addEventListener("click", () => {
+      const pid = deleteBtn.getAttribute("data-id");
+      if (confirm("هل أنتِ متأكدة من رغبتكِ في حذف هذا المنتج نهائياً؟ سيتم مزامنة الحذف فوراً وبشكل لا يمكن تراجعه.")) {
+        deleteProduct(pid);
+      }
+    });
+
+    fragment.appendChild(tr);
   });
 
-  // Dropdown Toggles (Cached structures - only one open at a time)
-  const triggers = [
-    { btn: DOM.triggerBrand, menu: DOM.menuBrand },
-    { btn: DOM.triggerColor, menu: DOM.menuColor },
-    { btn: DOM.triggerMaterial, menu: DOM.menuMaterial }
-  ];
+  DOM.tableBody.appendChild(fragment);
+}
 
-  triggers.forEach(t => {
-    if (t.btn && t.menu) {
-      t.btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        
-        // Close other dropdowns
-        triggers.forEach(other => {
-          if (other.btn !== t.btn) {
-            if (other.btn) other.btn.classList.remove("menu-open");
-            if (other.menu) other.menu.classList.add("hidden");
-          }
-        });
+async function updateProductField(id, field, value) {
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from("products")
+        .update({ [field]: value })
+        .eq("id", id);
+      
+      if (error) throw error;
 
-        // Toggle current dropdown
-        const isOpen = !t.menu.classList.contains("hidden");
-        if (isOpen) {
-          t.menu.classList.add("hidden");
-          t.btn.classList.remove("menu-open");
-        } else {
-          t.menu.classList.remove("hidden");
-          t.btn.classList.add("menu-open");
+      // Update local cache
+      currentProducts = currentProducts.map(p => {
+        if (p.id === id) {
+          return { ...p, [field]: value };
         }
+        return p;
       });
+      updateStats();
+      showToast("تم مزامنة التعديل بنجاح");
+    } catch (err) {
+      console.error("Database update error:", err);
+      showToast("خطأ أثناء مزامنة التعديل: " + err.message);
+      // Re-render to revert visual switch state
+      renderProductsTable();
     }
-  });
-
-  // Close dropdowns on outside clicks
-  document.addEventListener("click", () => {
-    triggers.forEach(t => {
-      if (t.btn) t.btn.classList.remove("menu-open");
-      if (t.menu) t.menu.classList.add("hidden");
-    });
-  });
-
-  // Prevent closing when clicking inside a dropdown list menu
-  document.querySelectorAll(".dropdown-menu-list").forEach(menu => {
-    menu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  });
-
-  // Brand Filter Events
-  DOM.brandFilters.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const val = e.currentTarget.getAttribute("data-filter-value");
-      appState.selectedBrand = val;
-      
-      DOM.brandFilters.forEach(b => b.classList.remove("active"));
-      e.currentTarget.classList.add("active");
-
-      // Close the menu
-      if (DOM.menuBrand) DOM.menuBrand.classList.add("hidden");
-      if (DOM.triggerBrand) DOM.triggerBrand.classList.remove("menu-open");
-      
-      applyFilters();
-    });
-  });
-
-  // Material Filter Events
-  DOM.materialFilters.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const val = e.currentTarget.getAttribute("data-filter-value");
-      appState.selectedMaterial = val;
-      
-      DOM.materialFilters.forEach(b => b.classList.remove("active"));
-      e.currentTarget.classList.add("active");
-
-      // Close the menu
-      if (DOM.menuMaterial) DOM.menuMaterial.classList.add("hidden");
-      if (DOM.triggerMaterial) DOM.triggerMaterial.classList.remove("menu-open");
-      
-      applyFilters();
-    });
-  });
-
-  // Color Swatch Circle Events
-  DOM.colorFilters.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const val = e.currentTarget.getAttribute("data-filter-value");
-      appState.selectedColorFamily = val;
-      
-      DOM.colorFilters.forEach(b => b.classList.remove("active"));
-      e.currentTarget.classList.add("active");
-
-      // Close the menu
-      if (DOM.menuColor) DOM.menuColor.classList.add("hidden");
-      if (DOM.triggerColor) DOM.triggerColor.classList.remove("menu-open");
-      
-      applyFilters();
-    });
-  });
-
-  // Bind clear actions
-  if (DOM.btnClearFilters) DOM.btnClearFilters.addEventListener("click", resetAllFilters);
-  if (DOM.btnResetEmpty) DOM.btnResetEmpty.addEventListener("click", resetAllFilters);
-}
-
-/* ==========================================================================
-   8. INTERACTIVE STORY MODAL SYSTEM (UX Requirements 2)
-   ========================================================================== */
-
-/**
- * Toggles "Our Story" overlay modal on and off with clean, graceful transitions
- * @param {Boolean} show True to open modal, False to dismiss
- */
-function toggleStoryModal(show) {
-  if (show) {
-    DOM.storyModal.classList.remove("hidden");
-    document.body.style.overflow = "hidden"; // Prevent background body-scrolling
   } else {
-    DOM.storyModal.classList.add("hidden");
-    document.body.style.overflow = ""; // Restore scrolling
+    showToast("تنبيه: قاعدة البيانات غير متصلة حالياً.");
   }
 }
 
-/**
- * Initialize interactive modal event listeners
- */
-function initializeModal() {
-  if (DOM.storyTriggerAbout) {
-    DOM.storyTriggerAbout.addEventListener("click", () => {
-      toggleStoryModal(true);
-    });
+async function deleteProduct(id) {
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from("products")
+        .delete()
+        .eq("id", id);
+      
+      if (error) throw error;
+
+      currentProducts = currentProducts.filter(p => p.id !== id);
+      renderProductsTable();
+      updateStats();
+      showToast("تم حذف المنتج ومزامنة التغيير بنجاح");
+    } catch (err) {
+      console.error("Database deletion error:", err);
+      showToast("فشل الحذف من قاعدة البيانات: " + err.message);
+    }
+  } else {
+    showToast("تنبيه: قاعدة البيانات غير متصلة حالياً.");
+  }
+}
+
+async function handleAddProduct() {
+  const category = document.getElementById("new-category").value;
+  const title = document.getElementById("new-title").value.trim();
+  const price = parseFloat(document.getElementById("new-price").value);
+  const imageUrl = document.getElementById("new-image").value;
+
+  if (!title || isNaN(price)) {
+    showToast("يرجى ملء جميع الحقول المطلوبة بشكل صحيح.");
+    return;
   }
 
-  if (DOM.modalCloseBtn) {
-    DOM.modalCloseBtn.addEventListener("click", () => {
-      toggleStoryModal(false);
-    });
+  const newId = `${category === "خيوط" ? "yarn" : "item"}-${Date.now()}`;
+  const newProduct = {
+    id: newId,
+    category: category,
+    title: title,
+    price: price,
+    image_url: imageUrl,
+    is_available: true,
+    is_best_seller: false,
+    is_new_arrival: true
+  };
+
+  // Dynamically pack values based on the product category
+  if (category === "خيوط") {
+    const brand = document.getElementById("new-brand").value;
+    const material = document.getElementById("new-material").value;
+    const shadeName = document.getElementById("new-shade").value.trim() || "درجة مميزة";
+    const colorFamily = document.getElementById("new-color-family").value;
+
+    newProduct.brand = brand;
+    newProduct.material = material;
+    newProduct.color_name = shadeName;
+    newProduct.color_family = colorFamily;
+  } else {
+    const size = document.getElementById("new-size").value.trim();
+    const description = document.getElementById("new-description").value.trim();
+
+    newProduct.size = size || "";
+    newProduct.description = description || "خامة وجودة عالية ومناسبة للأعمال الاحترافية";
   }
 
-  if (DOM.storyModal) {
-    DOM.storyModal.addEventListener("click", (e) => {
-      if (e.target === DOM.storyModal) {
-        toggleStoryModal(false);
-      }
-    });
-  }
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from("products")
+        .insert([newProduct]);
+      
+      if (error) throw error;
 
-  if (DOM.modalExploreBtn) {
-    DOM.modalExploreBtn.addEventListener("click", () => {
-      toggleStoryModal(false);
-      if (DOM.catalogSection) {
-        DOM.catalogSection.scrollIntoView({ behavior: "smooth" });
-      }
-    });
+      currentProducts.unshift(newProduct);
+      renderProductsTable();
+      updateStats();
+      
+      // Reset form and UI
+      DOM.formAdd.reset();
+      const yarnFields = document.getElementById("yarn-fields-container");
+      const genericFields = document.getElementById("generic-fields-container");
+      if (yarnFields) yarnFields.classList.remove("hidden");
+      if (genericFields) genericFields.classList.add("hidden");
+
+      showToast("تم نشر وتعميم المنتج بنجاح في كتالوج المتجر المباشر!");
+    } catch (err) {
+      console.error("Database insert error:", err);
+      showToast("خطأ أثناء نشر المنتج في قاعدة البيانات: " + err.message);
+    }
+  } else {
+    showToast("لا يمكن إضافة المنتج: العميل غير متصل بـ Supabase.");
   }
 }
 
 /* ==========================================================================
-   9. APPLICATION INGRESS
+   4. UTILITIES & HELPERS
    ========================================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  initializeFilters();
-  initializeModal();
-  buildFullCatalogDOM(); // Single initial pull and layout render on startup
-});
+
+function showToast(message) {
+  DOM.toast.textContent = message;
+  DOM.toast.classList.add("show");
+  setTimeout(() => {
+    DOM.toast.classList.remove("show");
+  }, 3000);
+}
+
+// Bind Global Actions
+function init() {
+  // Check auth immediately
+  checkAuthSession();
+
+  // Category select dynamic field showing/fading
+  const categorySelect = document.getElementById("new-category");
+  const yarnFields = document.getElementById("yarn-fields-container");
+  const genericFields = document.getElementById("generic-fields-container");
+
+  if (categorySelect && yarnFields && genericFields) {
+    categorySelect.addEventListener("change", (e) => {
+      const selected = e.target.value;
+      if (selected === "خيوط") {
+        yarnFields.classList.remove("hidden");
+        genericFields.classList.add("hidden");
+      } else {
+        yarnFields.classList.add("hidden");
+        genericFields.classList.remove("hidden");
+      }
+    });
+  }
+
+  // Bind Google auth click
+  if (DOM.btnGoogleAuth) {
+    DOM.btnGoogleAuth.addEventListener("click", handleGoogleLogin);
+  }
+
+  // Bind Logout
+  if (DOM.btnLogOut) {
+    DOM.btnLogOut.addEventListener("click", handleLogOut);
+  }
+
+  // Bind toggle config credentials panel
+  if (DOM.btnToggleConfig) {
+    DOM.btnToggleConfig.addEventListener("click", () => {
+      DOM.configPanel.classList.toggle("hidden");
+    });
+  }
+
+  // Save Supabase credentials click
+  if (DOM.btnSaveConfig) {
+    DOM.btnSaveConfig.addEventListener("click", () => {
+      const url = DOM.inputUrl.value.trim();
+      const key = DOM.inputKey.value.trim();
+      
+      if (url && key) {
+        localStorage.setItem("sb_url", url);
+        localStorage.setItem("sb_key", key);
+        showToast("تم حفظ بيانات Supabase بنجاح محلياً!");
+        const connected = initSupabase();
+        if (connected) {
+          // Attempt to re-run auth check with the new database connection
+          checkAuthSession();
+        }
+      } else {
+        showToast("يرجى إدخال الرابط والمفتاح معاً");
+      }
+    });
+  }
+
+  // Save new product form
+  if (DOM.formAdd) {
+    DOM.formAdd.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleAddProduct();
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
