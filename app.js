@@ -114,7 +114,7 @@ const DEFAULT_STORE_PRODUCTS = [
 ];
 
 /* WhatsApp Store Contact Number */
-const WHATSAPP_PHONE_NUMBER = "20123456789"; 
+const WHATSAPP_PHONE_NUMBER = "201287818714"; 
 
 /* ==========================================================================
    2. APPLICATION STATE
@@ -123,7 +123,9 @@ const appState = {
   selectedCategory: "all",
   selectedBrand: "all",
   selectedMaterial: "all",
-  selectedColorFamily: "all"
+  selectedColorFamily: "all",
+  searchQuery: "",
+  sortBy: "default"
 };
 
 const SUPABASE_URL = "https://qpjjocvkctfaydaxxzck.supabase.co";
@@ -151,6 +153,7 @@ const DOM = {
   brandFilters: document.querySelectorAll('[data-filter-type="brand"]'),
   materialFilters: document.querySelectorAll('[data-filter-type="material"]'),
   colorFilters: document.querySelectorAll('[data-filter-type="color_family"]'),
+  sortFilters: document.querySelectorAll('[data-filter-type="sort"]'),
   storyTriggerAbout: document.getElementById("story-trigger-about"),
   storyModal: document.getElementById("story-modal"),
   modalCloseBtn: document.getElementById("modal-close-btn"),
@@ -163,12 +166,20 @@ const DOM = {
   triggerBrand: document.getElementById("trigger-brand"),
   triggerColor: document.getElementById("trigger-color"),
   triggerMaterial: document.getElementById("trigger-material"),
+  triggerSort: document.getElementById("trigger-sort"),
   menuBrand: document.getElementById("menu-brand"),
   menuColor: document.getElementById("menu-color"),
   menuMaterial: document.getElementById("menu-material"),
+  menuSort: document.getElementById("menu-sort"),
   badgeBrand: document.getElementById("badge-brand"),
   badgeColor: document.getElementById("badge-color"),
-  badgeMaterial: document.getElementById("badge-material")
+  badgeMaterial: document.getElementById("badge-material"),
+  badgeSort: document.getElementById("badge-sort"),
+  productSearchInput: document.getElementById("product-search-input"),
+  clearSearchBtn: document.getElementById("clear-search-btn"),
+  recentSearchesDropdown: document.getElementById("recent-searches-dropdown"),
+  recentSearchesList: document.getElementById("recent-searches-list"),
+  clearAllRecentBtn: document.getElementById("clear-all-recent-btn")
 };
 
 /* ==========================================================================
@@ -249,7 +260,7 @@ async function buildFullCatalogDOM() {
   
   const fragment = document.createDocumentFragment();
   products.forEach((product, index) => {
-    const card = createProductCard(product);
+    const card = createProductCard(product, index);
     // Capped animation delay for smooth entry
     card.style.animationDelay = `${Math.min(index, 8) * 50}ms`;
     fragment.appendChild(card);
@@ -280,7 +291,22 @@ function applyFilters() {
     const materialMatch = appState.selectedMaterial === "all" || material === appState.selectedMaterial;
     const colorMatch = appState.selectedColorFamily === "all" || colorFamily === appState.selectedColorFamily;
     
-    const isMatch = categoryMatch && brandMatch && materialMatch && colorMatch;
+    let searchMatch = true;
+    if (appState.searchQuery && appState.searchQuery.trim() !== "") {
+      const queryStr = appState.searchQuery.toLowerCase().trim();
+      const titleEl = card.querySelector(".product-title");
+      const title = titleEl ? titleEl.textContent.toLowerCase() : "";
+      const cardBrand = brand.toLowerCase();
+      const translatedBrand = translateBrand(brand).toLowerCase();
+      const materialTranslated = translateMaterial(material).toLowerCase();
+      
+      searchMatch = title.includes(queryStr) || 
+                    cardBrand.includes(queryStr) || 
+                    translatedBrand.includes(queryStr) ||
+                    materialTranslated.includes(queryStr);
+    }
+    
+    const isMatch = categoryMatch && brandMatch && materialMatch && colorMatch && searchMatch;
     
     if (isMatch) {
       card.classList.remove("hidden");
@@ -288,6 +314,27 @@ function applyFilters() {
     } else {
       card.classList.add("hidden");
     }
+  });
+  
+  // Sort and physically reorder all cards in the DOM based on the selected sort criteria
+  const cardsArray = Array.from(cards);
+  cardsArray.sort((a, b) => {
+    const priceA = parseFloat(a.getAttribute("data-price") || 0);
+    const priceB = parseFloat(b.getAttribute("data-price") || 0);
+    
+    if (appState.sortBy === "low-to-high") {
+      return priceA - priceB;
+    } else if (appState.sortBy === "high-to-low") {
+      return priceB - priceA;
+    }
+    
+    const indexA = parseInt(a.getAttribute("data-index") || 0);
+    const indexB = parseInt(b.getAttribute("data-index") || 0);
+    return indexA - indexB;
+  });
+  
+  cardsArray.forEach(card => {
+    DOM.productsGrid.appendChild(card);
   });
   
   // Toggle layout structure based on dynamic visible counts
@@ -347,6 +394,16 @@ function syncDropdownTriggers() {
       DOM.badgeColor.textContent = colorName;
     }
   }
+
+  if (DOM.triggerSort && DOM.badgeSort) {
+    if (appState.sortBy === "default") {
+      DOM.triggerSort.classList.remove("active-trigger");
+      DOM.badgeSort.textContent = "الافتراضي";
+    } else {
+      DOM.triggerSort.classList.add("active-trigger");
+      DOM.badgeSort.textContent = appState.sortBy === "low-to-high" ? "السعر: من الأقل للأعلى" : "السعر: من الأعلى للأقل";
+    }
+  }
 }
 
 /**
@@ -378,9 +435,10 @@ function translateBrand(br) {
 /**
  * Creates product card DOM element with appropriate attributes and datasets
  * @param {Object} product Product model
+ * @param {number} index original order index
  * @returns {HTMLElement} Custom formatted div element
  */
-function createProductCard(product) {
+function createProductCard(product, index) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "product-card";
   cardDiv.id = `card-${product.id}`;
@@ -390,6 +448,8 @@ function createProductCard(product) {
   cardDiv.setAttribute("data-brand", product.brand || "all");
   cardDiv.setAttribute("data-material", product.material || "all");
   cardDiv.setAttribute("data-color-family", product.color_family || "all");
+  cardDiv.setAttribute("data-price", product.price || 0);
+  cardDiv.setAttribute("data-index", index !== undefined ? index : 0);
 
   // Overlaid badges markup
   let badgeHTML = "";
@@ -517,6 +577,18 @@ function resetAllFilters() {
   appState.selectedBrand = "all";
   appState.selectedMaterial = "all";
   appState.selectedColorFamily = "all";
+  appState.searchQuery = "";
+  appState.sortBy = "default";
+
+  if (DOM.productSearchInput) {
+    DOM.productSearchInput.value = "";
+  }
+  if (DOM.clearSearchBtn) {
+    DOM.clearSearchBtn.classList.add("hidden");
+  }
+  if (DOM.recentSearchesDropdown) {
+    DOM.recentSearchesDropdown.classList.add("hidden");
+  }
 
   // Re-sync all buttons styling states in dropdown lists
   DOM.brandFilters.forEach(btn => {
@@ -530,6 +602,12 @@ function resetAllFilters() {
   DOM.colorFilters.forEach(btn => {
     btn.classList.toggle("active", btn.getAttribute("data-filter-value") === "all");
   });
+
+  if (DOM.sortFilters) {
+    DOM.sortFilters.forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-filter-value") === "default");
+    });
+  }
 
   applyFilters();
 }
@@ -567,7 +645,8 @@ function initializeFilters() {
   const triggers = [
     { btn: DOM.triggerBrand, menu: DOM.menuBrand },
     { btn: DOM.triggerColor, menu: DOM.menuColor },
-    { btn: DOM.triggerMaterial, menu: DOM.menuMaterial }
+    { btn: DOM.triggerMaterial, menu: DOM.menuMaterial },
+    { btn: DOM.triggerSort, menu: DOM.menuSort }
   ];
 
   triggers.forEach(t => {
@@ -662,6 +741,25 @@ function initializeFilters() {
     });
   });
 
+  // Sorting Filter Events
+  if (DOM.sortFilters) {
+    DOM.sortFilters.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const val = e.currentTarget.getAttribute("data-filter-value");
+        appState.sortBy = val;
+        
+        DOM.sortFilters.forEach(b => b.classList.remove("active"));
+        e.currentTarget.classList.add("active");
+
+        // Close the menu
+        if (DOM.menuSort) DOM.menuSort.classList.add("hidden");
+        if (DOM.triggerSort) DOM.triggerSort.classList.remove("menu-open");
+        
+        applyFilters();
+      });
+    });
+  }
+
   // Bind clear actions
   if (DOM.btnClearFilters) DOM.btnClearFilters.addEventListener("click", resetAllFilters);
   if (DOM.btnResetEmpty) DOM.btnResetEmpty.addEventListener("click", resetAllFilters);
@@ -719,12 +817,217 @@ function initializeModal() {
   }
 }
 
+/**
+ * Set up real-time search events and the sticky stuck class toggle on scroll
+ */
+function initializeSearch() {
+  if (!DOM.productSearchInput) return;
+
+  function escapeHTML(str) {
+    if (!str) return "";
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function getRecentSearches() {
+    try {
+      const data = localStorage.getItem("recent_searches");
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(item => typeof item === "string" && item.trim() !== "").slice(0, 3);
+        }
+      }
+    } catch (e) {
+      console.error("Error reading recent searches", e);
+    }
+    return [];
+  }
+
+  function saveRecentSearches(searches) {
+    try {
+      const cleaned = searches.filter(item => item && item.trim() !== "").slice(0, 3);
+      localStorage.setItem("recent_searches", JSON.stringify(cleaned));
+    } catch (e) {
+      console.error("Error saving recent searches", e);
+    }
+  }
+
+  function addRecentSearch(query) {
+    if (!query || query.trim() === "") return;
+    const trimmed = query.trim();
+    let searches = getRecentSearches();
+    searches = searches.filter(item => item.toLowerCase() !== trimmed.toLowerCase());
+    searches.unshift(trimmed);
+    searches = searches.slice(0, 3);
+    saveRecentSearches(searches);
+  }
+
+  function renderRecentSearches() {
+    if (!DOM.recentSearchesDropdown || !DOM.recentSearchesList) return;
+    
+    const searches = getRecentSearches();
+    if (searches.length === 0) {
+      DOM.recentSearchesDropdown.classList.add("hidden");
+      return;
+    }
+    
+    DOM.recentSearchesList.innerHTML = "";
+    searches.forEach(search => {
+      const item = document.createElement("div");
+      item.className = "recent-search-item";
+      
+      const textWrapper = document.createElement("div");
+      textWrapper.className = "recent-search-item-text-wrapper";
+      textWrapper.innerHTML = `
+        <svg class="recent-search-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>${escapeHTML(search)}</span>
+      `;
+      
+      textWrapper.addEventListener("click", (e) => {
+        e.stopPropagation();
+        DOM.productSearchInput.value = search;
+        appState.searchQuery = search;
+        if (DOM.clearSearchBtn) DOM.clearSearchBtn.classList.remove("hidden");
+        applyFilters();
+        DOM.recentSearchesDropdown.classList.add("hidden");
+        // Bump to top of recent searches list
+        addRecentSearch(search);
+      });
+      
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-single-recent-btn";
+      deleteBtn.type = "button";
+      deleteBtn.title = "حذف";
+      deleteBtn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      `;
+      
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        let currentSearches = getRecentSearches();
+        currentSearches = currentSearches.filter(s => s !== search);
+        saveRecentSearches(currentSearches);
+        renderRecentSearches();
+      });
+      
+      item.appendChild(textWrapper);
+      item.appendChild(deleteBtn);
+      DOM.recentSearchesList.appendChild(item);
+    });
+    
+    DOM.recentSearchesDropdown.classList.remove("hidden");
+  }
+
+  let saveSearchTimeout = null;
+
+  DOM.productSearchInput.addEventListener("input", (e) => {
+    const value = e.target.value;
+    appState.searchQuery = value;
+
+    if (DOM.clearSearchBtn) {
+      if (value.trim() !== "") {
+        DOM.clearSearchBtn.classList.remove("hidden");
+      } else {
+        DOM.clearSearchBtn.classList.add("hidden");
+      }
+    }
+
+    applyFilters();
+
+    // Debounce saving search query to recent searches
+    if (saveSearchTimeout) clearTimeout(saveSearchTimeout);
+    if (value.trim() !== "") {
+      saveSearchTimeout = setTimeout(() => {
+        addRecentSearch(value.trim());
+      }, 2000); // 2 seconds of inactivity saves the query
+    }
+  });
+
+  // Save instantly on pressing Enter
+  DOM.productSearchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const val = DOM.productSearchInput.value.trim();
+      if (val !== "") {
+        addRecentSearch(val);
+      }
+      DOM.productSearchInput.blur();
+      if (DOM.recentSearchesDropdown) {
+        DOM.recentSearchesDropdown.classList.add("hidden");
+      }
+    }
+  });
+
+  // Focus or click displays the dropdown
+  DOM.productSearchInput.addEventListener("focus", () => {
+    renderRecentSearches();
+  });
+
+  DOM.productSearchInput.addEventListener("click", (e) => {
+    e.stopPropagation();
+    renderRecentSearches();
+  });
+
+  // Clear all recent searches
+  if (DOM.clearAllRecentBtn) {
+    DOM.clearAllRecentBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveRecentSearches([]);
+      if (DOM.recentSearchesDropdown) {
+        DOM.recentSearchesDropdown.classList.add("hidden");
+      }
+    });
+  }
+
+  // Dismiss dropdown when clicking elsewhere
+  document.addEventListener("click", (e) => {
+    if (DOM.recentSearchesDropdown && 
+        !DOM.productSearchInput.contains(e.target) && 
+        !DOM.recentSearchesDropdown.contains(e.target)) {
+      DOM.recentSearchesDropdown.classList.add("hidden");
+    }
+  });
+
+  if (DOM.clearSearchBtn) {
+    DOM.clearSearchBtn.addEventListener("click", () => {
+      DOM.productSearchInput.value = "";
+      appState.searchQuery = "";
+      DOM.clearSearchBtn.classList.add("hidden");
+      DOM.productSearchInput.focus();
+      applyFilters();
+      if (DOM.recentSearchesDropdown) {
+        DOM.recentSearchesDropdown.classList.add("hidden");
+      }
+    });
+  }
+
+  // Toggle 'stuck' class when search bar scrolls past sticky point
+  const searchWrapper = document.querySelector(".sticky-search-wrapper");
+  if (searchWrapper) {
+    window.addEventListener("scroll", () => {
+      const isStuck = window.scrollY > 150;
+      searchWrapper.classList.toggle("stuck", isStuck);
+    });
+  }
+}
+
 /* ==========================================================================
    9. APPLICATION INGRESS
    ========================================================================== */
 function init() {
   initializeFilters();
   initializeModal();
+  initializeSearch();
   buildFullCatalogDOM(); // Single initial pull and layout render on startup
 
   // Initialize Lucide Icons for static page elements
