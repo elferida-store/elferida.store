@@ -94,6 +94,7 @@ body {
   flex-direction: column;
   box-shadow: 0 0 50px rgba(62, 58, 53, 0.04);
   padding: 0 20px; /* Constrain elements from touching absolute edges on any device */
+  overflow-x: hidden;
 }
 
 /* ==========================================
@@ -258,15 +259,19 @@ body {
 .story-scroll-container {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap; /* Wraps beautiful 2 lines on mobile */
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
-  overflow-x: hidden;
-  gap: 12px;
-  padding: 4px 20px;
+  overflow-x: visible;
+  gap: 12px 14px;
+  padding: 4px 12px;
+}
+
+.story-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
 }
 
 /* Interactive Story Bubble */
@@ -279,7 +284,7 @@ body {
   background: none;
   cursor: pointer;
   text-decoration: none;
-  flex: 1 1 auto;
+  flex: 0 0 auto; /* Keep bubbles/cards from shrinking */
   max-width: 150px;
   transition: all 0.3s ease;
 }
@@ -347,8 +352,13 @@ body {
   filter: drop-shadow(0 2px 8px rgba(24, 119, 242, 0.6));
 }
 
-.story-bubble-wrapper[href*="wa.me"]:hover .story-inner-img svg {
+.story-bubble-wrapper[href*="wa.me"]:hover .story-inner-img svg,
+.story-bubble-wrapper[href*="whatsapp.com"]:hover .story-inner-img svg {
   filter: drop-shadow(0 2px 8px rgba(122, 208, 109, 0.6));
+}
+
+.story-bubble-wrapper[href*="messenger.com"]:hover .story-inner-img svg {
+  filter: drop-shadow(0 2px 8px rgba(162, 53, 235, 0.6));
 }
 
 .text-avatar {
@@ -377,6 +387,9 @@ body {
 .story-fb { background: linear-gradient(135deg, #f0f4fc, #dbe4f9); }
 .story-tiktok { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); }
 .story-wa { background: linear-gradient(135deg, #ebf2ee, #d5e4dc); }
+.story-wa-group { background: linear-gradient(135deg, #e8f8f5, #d1f2eb); }
+.story-wa-channel { background: linear-gradient(135deg, #eafaf1, #d5f5e3); }
+.story-messenger { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
 
 /* ==========================================
    6. CATALOG SECTION & HEADER
@@ -1220,9 +1233,19 @@ body {
 /* ==========================================
    13. TRUE FLUID RESPONSIVENESS (Media Queries)
    ========================================== */
+@media (max-width: 767px) {
+  .dropdowns-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 8px;
+  }
+}
+
 @media (max-width: 480px) {
   .dropdowns-row {
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 6px;
   }
   
   .dropdown-trigger-btn {
@@ -1237,19 +1260,21 @@ body {
 
 @media (min-width: 768px) {
   /* Expand products grid with controlled, capped card widths on tablets */
+  #catalog-section #products-grid,
   #products-grid, .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     justify-content: center;
     gap: 1.5rem; /* Balanced tablet transition gap */
   }
 
   /* Expand social hub stories into a beautiful centered horizontal row */
   .story-scroll-container {
-    max-width: 1000px;
+    width: 480px;
+    max-width: 100%;
     justify-content: center;
-    flex-wrap: nowrap;
-    gap: 28px;
-    padding: 12px 40px;
+    flex-wrap: wrap; /* Wrap nicely with exactly 5 on first line, 3 on second line */
+    gap: 16px 20px;
+    padding: 12px 24px;
     overflow-x: visible;
   }
 
@@ -1267,8 +1292,8 @@ body {
   }
 
   /* Increase padding and space across the store catalog */
-  .catalog {
-    padding: 32px 40px;
+  #catalog-section {
+    padding: 32px 48px;
   }
 
   /* Sticky header padding adjustments for desktop sizes */
@@ -1301,6 +1326,15 @@ body {
 }
 
 @media (min-width: 1024px) {
+  /* Keep stories hub wrapped with exactly 5 items on the first line and 3 on the second line */
+  .story-scroll-container {
+    width: 480px;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 16px 20px;
+    padding: 12px 24px;
+  }
+
   /* Max 4 columns on wide screens, keeping cards perfectly aligned and capped */
   #products-grid, .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1869,3 +1903,213 @@ input:checked + .slider:before {
 .hidden {
   display: none !important;
 }
+
+/* ==========================================
+   8. STICKY SEARCH BAR (Premium Design)
+   ========================================== */
+.sticky-search-wrapper {
+  position: sticky;
+  top: 52px; /* Aligns right beneath the sticky header on mobile */
+  z-index: 99; /* Under header, above dropdown items */
+  background-color: var(--bg-app);
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .sticky-search-wrapper {
+    top: 60px; /* Aligns right beneath the sticky header on desktop */
+  }
+}
+
+.sticky-search-wrapper.stuck {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  padding: 10px 4px;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-container:hover {
+  border-color: var(--color-text-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.search-input-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+}
+
+.search-icon-wrapper {
+  position: absolute;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.search-input-container:focus-within .search-icon-wrapper {
+  color: var(--color-primary);
+}
+
+.search-input {
+  width: 100%;
+  height: 48px; /* Touch target minimum */
+  padding: 12px 44px 12px 16px; /* Space for search icon on right, and clear button on left */
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+.clear-search-btn {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--bg-pill);
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.clear-search-btn:hover {
+  background-color: var(--border-light);
+  color: var(--color-text-main);
+  transform: scale(1.05);
+}
+
+.clear-search-btn.hidden {
+  display: none !important;
+}
+
+/* Recent Searches Dropdown styles */
+.recent-searches-dropdown {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  z-index: 101;
+  padding: 12px;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.recent-searches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 8px;
+}
+
+.recent-searches-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.clear-all-recent-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.clear-all-recent-btn:hover {
+  background-color: rgba(79, 70, 229, 0.06);
+  text-decoration: underline;
+}
+
+.recent-searches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recent-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.recent-search-item:hover {
+  background-color: var(--bg-pill);
+}
+
+.recent-search-item-text-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.recent-search-item-icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.delete-single-recent-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.delete-single-recent-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  transform: scale(1.1);
+}
+
