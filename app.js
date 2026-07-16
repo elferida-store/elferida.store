@@ -82,7 +82,7 @@ const DEFAULT_STORE_PRODUCTS = [
     color_name: "وردي بلوسوم دافئ",
     color_family: "red-pink",
     price: 98.00,
-    image_url: "assets/terracotta_rose.jpg",
+    image_url: "assets/earthy_beige.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: true
@@ -110,6 +110,20 @@ const DEFAULT_STORE_PRODUCTS = [
     is_available: true,
     is_best_seller: false,
     is_new_arrival: false
+  },
+ {
+    id: "yarn-005",
+    category: "خيوط",
+    title: "إيكو سوفت قطن مصري",
+    brand: "Himalaya",
+    material: "Cotton",
+    color_name: "اصفر مسترده",
+    color_family: "yellow-mustard",
+    price: 98.00,
+    image_url: "assets/warm_mustard.jpg",
+    is_available: true,
+    is_best_seller: false,
+    is_new_arrival: true
   }
 ];
 
