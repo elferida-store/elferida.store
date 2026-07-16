@@ -16,7 +16,7 @@ const DEFAULT_STORE_PRODUCTS = [
     color_name: "كشمير وردي هادئ",
     color_family: "red-pink",
     price: 85.00,
-    image_url: "/images/terracotta_rose.jpg",
+    image_url: "assets/terracotta_rose.jpg",
     is_available: true,
     is_best_seller: true,
     is_new_arrival: false
@@ -30,7 +30,7 @@ const DEFAULT_STORE_PRODUCTS = [
     color_name: "أخضر ميرمية ساحر",
     color_family: "green-sage",
     price: 142.00,
-    image_url: "/images/sage_green.jpg",
+    image_url: "assets/sage_green.jpg",
     is_available: true,
     is_best_seller: true,
     is_new_arrival: true
@@ -42,7 +42,7 @@ const DEFAULT_STORE_PRODUCTS = [
     price: 245.00,
     size: "8 مقاسات (2.5 - 6.0 ملم)",
     description: "سنارات مريحة بمقبض سليكون ناعم لتقليل تعب اليدين أثناء الحياكة الطويلة.",
-    image_url: "/images/warm_mustard.jpg",
+    image_url: "assets/warm_mustard.jpg",
     is_available: true,
     is_best_seller: true,
     is_new_arrival: true
@@ -56,7 +56,7 @@ const DEFAULT_STORE_PRODUCTS = [
     color_name: "أزرق باستيل ناعم",
     color_family: "blue-denim",
     price: 69.00,
-    image_url: "/images/denim_blue.jpg",
+    image_url: "assets/denim_blue.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: false
@@ -68,7 +68,7 @@ const DEFAULT_STORE_PRODUCTS = [
     price: 32.00,
     size: "30x50 سم - فتحات 2 ملم",
     description: "شبك كروشيه عالي الجودة لصناعة حقائب وعلب منسوجة متماسكة واحترافية.",
-    image_url: "/images/earthy_beige.jpg",
+    image_url: "assets/earthy_beige.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: false
@@ -82,7 +82,7 @@ const DEFAULT_STORE_PRODUCTS = [
     color_name: "وردي بلوسوم دافئ",
     color_family: "red-pink",
     price: 98.00,
-    image_url: "/images/terracotta_rose.jpg",
+    image_url: "assets/terracotta_rose.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: true
@@ -94,7 +94,7 @@ const DEFAULT_STORE_PRODUCTS = [
     price: 55.00,
     size: "مقاس 4.0 ملم",
     description: "سنارة بامبو خفيفة الوزن ومصقولة بعناية فائقة لانزلاق مثالي وسلس للخيوط.",
-    image_url: "/images/sage_green.jpg",
+    image_url: "assets/sage_green.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: false
@@ -106,7 +106,7 @@ const DEFAULT_STORE_PRODUCTS = [
     price: 48.00,
     size: "علبة بها 50 قطعة ملونة",
     description: "دبابيس لتحديد الغرز البلاستيكية الآمنة مريحة للاستخدام وسهلة الغلق.",
-    image_url: "/images/denim_blue.jpg",
+    image_url: "assets/denim_blue.jpg",
     is_available: true,
     is_best_seller: false,
     is_new_arrival: false
